@@ -1,34 +1,82 @@
 server:
-  port: ${PORT:8080}
+  port: 8080
 
 spring:
   application:
-    name: gym-api
+    name: minha-api-dev
 
+  # ===============================
+  # DATASOURCE - H2 (DEV)
+  # ===============================
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://db.wahhgtlciqsrurrtstvi.supabase.co:5432/postgres
+    username: postgres
+    password: 94sJNJL0J4UZYci4
 
+  # ===============================
+  # JPA / HIBERNATE
+  # ===============================
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: validate
-    show-sql: false
+      ddl-auto: validate # Flyway manda, Hibernate obedece
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
+  # ===============================
+  # H2 CONSOLE
+  # ===============================
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # ===============================
+  # FLYWAY
+  # ===============================
   flyway:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
 
+  # ===============================
+  # SECURITY (DEV MODE)
+  # ===============================
+  #  security:
+  #    user:
+  #      name: admin
+  #      password: "{noop}admin"
+  #      roles: ADMIN
+
+  # ===============================
+  # GRAPHQL
+  # ===============================
+  graphql:
+    graphiql:
+      enabled: true
+      path: /graphiql
+    schema:
+      printer:
+        enabled: true
+
+# ===============================
+# JWT (JJWT)
+# ===============================
 jwt:
-  secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION:86400000}
+  secret: "mYs3cr3tK3y$uP3rS3cur3W1thAtL3ast256B1tsF0rHS256Alg0r1thm!"
+  expiration: 86400000 # 24h em ms
 
 cookie:
-  secure: true
-
+  secure: false
+# ===============================
+# LOGGING
+# ===============================
 logging:
   level:
-    root: WARN
-    org.springframework.web: INFO
+    root: INFO
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.security: DEBUG

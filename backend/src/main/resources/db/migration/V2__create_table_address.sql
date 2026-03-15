@@ -5,13 +5,13 @@
 -- =============================================================================
 
 CREATE TABLE addresses (
-id BIGINT PRIMARY KEY AUTO_INCREMENT,
-number INT,
-zip_code VARCHAR(10),
-district VARCHAR(100),
-street_name VARCHAR(150),
-city VARCHAR(100),
-state VARCHAR(2)
+                           id BIGSERIAL PRIMARY KEY,
+                           number INT,
+                           zip_code VARCHAR(10),
+                           district VARCHAR(100),
+                           street_name VARCHAR(150),
+                           city VARCHAR(100),
+                           state VARCHAR(2)
 );
 
 -- Índices para buscas comuns

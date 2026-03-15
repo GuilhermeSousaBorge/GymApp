@@ -5,26 +5,39 @@
 -- =============================================================================
 
 CREATE TABLE users (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(150) NOT NULL,
-    email VARCHAR(150) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    cpf VARCHAR(14) UNIQUE,
-    phone VARCHAR(20),
-    gender VARCHAR(10) NOT NULL,
-    birth_date TIMESTAMP,
-    active BOOLEAN NOT NULL DEFAULT TRUE,
+                       id BIGSERIAL PRIMARY KEY,
+                       name VARCHAR(150) NOT NULL,
+                       email VARCHAR(150) NOT NULL UNIQUE,
+                       password_hash VARCHAR(255) NOT NULL,
+                       cpf VARCHAR(14) UNIQUE,
+                       phone VARCHAR(20),
+                       gender VARCHAR(10) NOT NULL,
+                       birth_date DATE,
+                       active BOOLEAN NOT NULL DEFAULT TRUE,
 
-    role_id BIGINT NOT NULL,
-    address_id BIGINT,
+                       role_id BIGINT NOT NULL,
+                       address_id BIGINT,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                       updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles(id),
-    CONSTRAINT fk_users_address FOREIGN KEY (address_id) REFERENCES addresses(id) ON DELETE SET NULL,
-    CONSTRAINT chk_users_gender CHECK (gender IN ('MALE', 'FEMALE', 'OTHER'))
+                       CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles(id),
+                       CONSTRAINT fk_users_address FOREIGN KEY (address_id) REFERENCES addresses(id) ON DELETE SET NULL,
+                       CONSTRAINT chk_users_gender CHECK (gender IN ('MALE', 'FEMALE', 'OTHER'))
 );
+
+-- Trigger para atualizar updated_at automaticamente
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_users_updated_at
+    BEFORE UPDATE ON users
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Índices para performance e buscas
 CREATE INDEX idx_users_email ON users(email);
