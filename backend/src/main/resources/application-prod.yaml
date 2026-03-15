@@ -13,11 +13,6 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-  management:
-    endpoints:
-      web:
-        exposure:
-          include: health
 
   # ===============================
   # JPA / HIBERNATE
@@ -55,3 +50,11 @@ logging:
     org.springframework.web: WARN
     org.hibernate.SQL: WARN
     org.springframework.security: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+cookie:
+  secure: ${COOKIE_SECURE:true}
