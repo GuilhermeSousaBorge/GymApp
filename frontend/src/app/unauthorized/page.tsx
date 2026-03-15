@@ -2,8 +2,10 @@
 import { Button } from "@/components/ui/button"
 import { ShieldOff } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function Unauthorized() {
+  const router = useRouter()
   return (
     <div className="min-h-screen bg-zinc-50 flex items-center justify-center p-6">
       <div className="flex flex-col items-center text-center max-w-md gap-6">
@@ -27,8 +29,8 @@ export default function Unauthorized() {
         </div>
 
         <div className="flex gap-3">
-          <Button asChild variant="outline" onClick={() => history.back()}>
-            <Link href="javascript:history.back()">Voltar</Link>
+          <Button asChild variant="outline" onClick={() => router.back()}>
+            Voltar
           </Button>
           <Button asChild className="bg-yellow-400 text-zinc-900 hover:bg-yellow-500">
             <Link href="/auth">Fazer login</Link>
