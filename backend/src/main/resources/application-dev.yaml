@@ -1,83 +1,34 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   application:
-    name: minha-api-dev
+    name: gym-api
 
-  # ===============================
-  # DATASOURCE - H2 (DEV)
-  # ===============================
   datasource:
-    url: jdbc:h2:file:./data/gymDB;AUTO_SERVER=TRUE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: sa
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
-  # ===============================
-  # JPA / HIBERNATE
-  # ===============================
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: validate # Flyway manda, Hibernate obedece
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+      ddl-auto: validate
+    show-sql: false
 
-  # ===============================
-  # H2 CONSOLE
-  # ===============================
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-
-  # ===============================
-  # FLYWAY
-  # ===============================
   flyway:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
 
-  # ===============================
-  # SECURITY (DEV MODE)
-  # ===============================
-#  security:
-#    user:
-#      name: admin
-#      password: "{noop}admin"
-#      roles: ADMIN
-
-  # ===============================
-  # GRAPHQL
-  # ===============================
-  graphql:
-    graphiql:
-      enabled: true
-      path: /graphiql
-    schema:
-      printer:
-        enabled: true
-
-# ===============================
-# JWT (JJWT)
-# ===============================
 jwt:
-  secret: "mYs3cr3tK3y$uP3rS3cur3W1thAtL3ast256B1tsF0rHS256Alg0r1thm!"
-  expiration: 86400000 # 24h em ms
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}
 
 cookie:
-  secure: false
-# ===============================
-# LOGGING
-# ===============================
+  secure: true
+
 logging:
   level:
-    root: INFO
-    org.springframework.web: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.springframework.security: DEBUG
+    root: WARN
+    org.springframework.web: INFO
