@@ -1,3 +1,5 @@
 # Default ignored files
 /shelf/
 /workspace.xml
+application-dev.yml
+application-prod.yml
