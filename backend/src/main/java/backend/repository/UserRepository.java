@@ -1,6 +1,8 @@
 package backend.repository;
 
 import backend.model.entity.User;
+import backend.model.valueObjects.Cpf;
+import backend.model.valueObjects.Email;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,15 +19,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Spring Data JPA gera a query automaticamente baseado no nome do método
      * findByEmail → SELECT * FROM users WHERE email = ?
      */
-    Optional<User> findByEmail(String email);
+    Optional<User> findByEmail(Email email);
 
     /**
      * Verifica se existe usuário com determinado email
      * existsByEmail → SELECT COUNT(*) > 0 FROM users WHERE email = ?
      */
-    boolean existsByEmail(String email);
+    boolean existsByEmail(Email email);
 
-    boolean existsByCpf(String cpf);
+    boolean existsByCpf(Cpf cpf);
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.role.name = 'Aluno' AND u.active = true")
     int countByActiveTrue();

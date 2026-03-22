@@ -1,5 +1,6 @@
 package backend.service;
 
+import backend.dto.request.user.UserRequest;
 import backend.dto.request.user.UserUpdateRequest;
 import backend.dto.response.user.UserResponse;
 import backend.infrastructure.exception.BadRequestException;
@@ -9,11 +10,14 @@ import backend.model.entity.Address;
 import backend.model.entity.Role;
 import backend.model.entity.User;
 import backend.model.enums.Roles;
+import backend.model.valueObjects.Cpf;
+import backend.model.valueObjects.Email;
 import backend.repository.RoleRepository;
 import backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,11 +34,6 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
     private final JwtTokenProvider jwtTokenProvider;
-
-
-    public void createUser() {
-        log.info("Criando usuário...");
-    }
 
     @Transactional(readOnly = true)
     public UserResponse getUserById(Long id) {
@@ -69,15 +68,17 @@ public class UserService {
         log.info("Atualizando usuário com ID: {}", id);
         // Lógica para atualizar usuário
         User user = getUser(id);
+        Email email = new Email(userRequest.getEmail());
+        Cpf cpf = new Cpf(userRequest.getCpf());
 
-        if(userRequest.getEmail() != null && !user.getEmail().equals(userRequest.getEmail())){
-            if(userRepository.existsByEmail(userRequest.getEmail())){
+        if(userRequest.getEmail() != null && !user.getEmail().equals(email)){
+            if(userRepository.existsByEmail(email)){
                 throw new BadRequestException("Email já cadastrado");
             }
         }
 
-        if(userRequest.getCpf() != null && !Objects.equals(user.getCpf(), userRequest.getCpf())){
-            if(userRepository.existsByCpf(userRequest.getCpf())){
+        if(userRequest.getCpf() != null && !Objects.equals(user.getCpf(), cpf)){
+            if(userRepository.existsByCpf(cpf)){
                 throw new BadRequestException("CPF já cadastrado");
             }
         }

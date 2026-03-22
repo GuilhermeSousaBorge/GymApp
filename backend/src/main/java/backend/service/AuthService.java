@@ -6,6 +6,8 @@ import backend.dto.response.auth.LoginResponse;
 import backend.dto.response.user.UserResponse;
 import backend.model.entity.Role;
 import backend.model.entity.User;
+import backend.model.valueObjects.Email;
+import backend.model.valueObjects.Password;
 import backend.repository.RoleRepository;
 import backend.repository.UserRepository;
 import backend.infrastructure.exception.BadRequestException;
@@ -50,7 +52,9 @@ public class AuthService {
     public LoginResponse login(LoginRequest request) {
         log.info("Tentativa de login para email: {}", request.getEmail());
 
-        User user = userRepository.findByEmail(request.getEmail())
+        Email email = new Email(request.getEmail());
+
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     log.warn("Login falhou: email não encontrado - {}", request.getEmail());
                     return new UnauthorizedException("Email ou senha inválidos");
@@ -61,7 +65,7 @@ public class AuthService {
             throw new UnauthorizedException("Usuário inativo");
         }
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+        if (!user.isPasswordValid(request.getPassword(), passwordEncoder)) {
             log.warn("Login falhou: senha incorreta - {}", request.getEmail());
             throw new UnauthorizedException("Email ou senha inválidos");
         }
@@ -83,18 +87,20 @@ public class AuthService {
     public LoginResponse register(RegisterRequest request) {
         log.info("Tentativa de registro para email: {}", request.getEmail());
 
-        if (userRepository.existsByEmail(request.getEmail())) {
+        Email email = new Email(request.getEmail());
+
+        if (userRepository.existsByEmail(email)) {
             log.warn("Registro falhou: email já existe - {}", request.getEmail());
             throw new BadRequestException("Email já cadastrado");
         }
 
-        String passwordHash = passwordEncoder.encode(request.getPassword());
+        Password passwordHash = Password.create(request.getPassword(), passwordEncoder);
 
         Role defaultRole = roleRepository.findByName("Aluno") .orElseThrow(() -> new IllegalStateException("Role Aluno não encontrada"));
 
         User newUser = User.builder()
                 .name(request.getName())
-                .email(request.getEmail())
+                .email(email)
                 .passwordHash(passwordHash)
                 .gender(request.getGender())
                 .active(true)

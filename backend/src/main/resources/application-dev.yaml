@@ -9,15 +9,15 @@ spring:
   # DATASOURCE - H2 (DEV)
   # ===============================
   datasource:
-    url: jdbc:postgresql://db.wahhgtlciqsrurrtstvi.supabase.co:5432/postgres
+    url: jdbc:postgresql://localhost:5433/gym_dev
     username: postgres
-    password: 94sJNJL0J4UZYci4
+    password: postgres
 
   # ===============================
   # JPA / HIBERNATE
   # ===============================
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate # Flyway manda, Hibernate obedece
     show-sql: true

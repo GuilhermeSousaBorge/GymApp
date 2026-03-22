@@ -1,12 +1,19 @@
 package backend.model.entity;
 
 import backend.dto.request.user.UserRequest;
+import backend.model.converters.CpfConverter;
+import backend.model.converters.EmailConverter;
+import backend.model.converters.PasswordConverter;
 import backend.model.enums.Gender;
 import backend.model.interfaces.UserUpdatable;
+import backend.model.valueObjects.Cpf;
+import backend.model.valueObjects.Email;
+import backend.model.valueObjects.Password;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,13 +43,16 @@ public class User {
     private String name;
 
     @Column(nullable = false, unique = true, length = 150)
-    private String email;
+    @Convert(converter = EmailConverter.class)
+    private Email email;
 
     @Column(name = "password_hash", nullable = false)
-    private String passwordHash;  // Senha criptografada com BCrypt
+    @Convert(converter = PasswordConverter.class)
+    private Password passwordHash;  // Senha criptografada com BCrypt
 
     @Column(unique = true, length = 14)
-    private String cpf;
+    @Convert(converter = CpfConverter.class)
+    private Cpf cpf;
 
     @Column(length = 20)
     private String phone;
@@ -95,10 +105,14 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    public boolean isPasswordValid(String rawPassword, PasswordEncoder encoder) {
+        return this.passwordHash.matches(rawPassword, encoder);
+    }
+
     public void updateForm(UserUpdatable request){
         if(request.getName() != null) this.name = request.getName();
-        if(request.getEmail() != null) this.email = request.getEmail();
-        if(request.getCpf() != null) this.cpf = request.getCpf();
+        if(request.getEmail() != null) this.email = new Email(request.getEmail());
+        if(request.getCpf() != null) this.cpf = new Cpf(request.getCpf());
         if(request.getPhone() != null) this.phone = request.getPhone();
         if(request.getGender() != null) this.gender = request.getGender();
         if(request.getBirthDate() != null) this.birthDate = request.getBirthDate();
