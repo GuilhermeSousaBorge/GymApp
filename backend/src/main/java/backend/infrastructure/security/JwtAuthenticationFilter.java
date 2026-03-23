@@ -1,7 +1,7 @@
 package backend.infrastructure.security;
 
-import backend.model.entity.User;
-import backend.repository.UserRepository;
+import backend.user.model.entity.User;
+import backend.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

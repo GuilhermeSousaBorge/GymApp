@@ -1,11 +1,11 @@
 package backend.infrastructure.security;
 
-import backend.model.entity.TrainingProgram;
-import backend.model.entity.TrainingSheet;
-import backend.model.entity.User;
-import backend.repository.TrainingExerciseRepository;
-import backend.repository.TrainingProgramRepository;
-import backend.repository.TrainingSheetRepository;
+import backend.training.model.entity.TrainingProgram;
+import backend.training.model.entity.TrainingSheet;
+import backend.user.model.entity.User;
+import backend.training.repository.TrainingExerciseRepository;
+import backend.training.repository.TrainingProgramRepository;
+import backend.training.repository.TrainingSheetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
