@@ -1,9 +1,9 @@
 package backend.dashboard.controller;
 
-import backend.dto.response.dashboard.AdminDashboardResponse;
-import backend.dto.response.dashboard.StudentDashboardResponse;
+import backend.dashboard.dto.AdminDashboardResponse;
+import backend.dashboard.dto.StudentDashboardResponse;
+import backend.dashboard.service.DashboardService;
 import backend.infrastructure.security.IsAdmin;
-import backend.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
