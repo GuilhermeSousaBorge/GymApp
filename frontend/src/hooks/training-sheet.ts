@@ -19,7 +19,8 @@ export const useSheets = (params: Params) =>
 export const useSheetDetails = (id: number | undefined) =>
     useQuery({
         queryKey: ["training-sheet", id],
-        queryFn: () => trainingSheetService.details(id)
+        queryFn: () => trainingSheetService.details(id),
+        enabled: !!id
     })
 
 export const useCreateSheet = () => {
