@@ -1,6 +1,5 @@
 package backend.training.dto;
 
-import backend.exercise.model.entity.Exercise;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -47,13 +46,6 @@ public class TrainingExerciseResponse {
         public static class CategoryInfo {
             private Long id;
             private String muscleGroup;
-        }
-
-        public ExerciseInfo(Exercise exercise) {
-            this.id = exercise.getId();
-            this.name = exercise.getName();
-            this.description = exercise.getDescription();
-            this.equipment = exercise.getEquipment();
         }
     }
 }

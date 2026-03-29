@@ -2,7 +2,8 @@ package backend.dashboard.controller;
 
 import backend.dashboard.dto.AdminDashboardResponse;
 import backend.dashboard.dto.StudentDashboardResponse;
-import backend.dashboard.service.DashboardService;
+import backend.dashboard.usecase.GetAdminDashboardUseCase;
+import backend.dashboard.usecase.GetStudentDashboardUseCase;
 import backend.infrastructure.security.IsAdmin;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,17 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("isAuthenticated()")
 public class DashboardController {
 
-    private final DashboardService dashboardService;
+    private final GetAdminDashboardUseCase getAdminDashboardUseCase;
+    private final GetStudentDashboardUseCase getStudentDashboardUseCase;
 
     @GetMapping("/admin")
     @IsAdmin
     public ResponseEntity<AdminDashboardResponse> getAdminDashboard() {
-        return ResponseEntity.ok(dashboardService.getAdminDashboard());
+        return ResponseEntity.ok(getAdminDashboardUseCase.execute());
     }
 
     @GetMapping("/student")
     public ResponseEntity<StudentDashboardResponse> getStudentDashboard(Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        return ResponseEntity.ok(dashboardService.getStudentDashboard(userId));
+        return ResponseEntity.ok(getStudentDashboardUseCase.execute(userId));
     }
 }

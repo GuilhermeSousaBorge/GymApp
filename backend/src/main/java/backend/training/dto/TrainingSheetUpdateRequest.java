@@ -1,6 +1,7 @@
 package backend.training.dto;
 
 import backend.training.model.enums.DayOfWeek;
+import backend.training.model.interfaces.TrainingSheetUpdatable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -13,7 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TrainingSheetUpdateRequest {
+public class TrainingSheetUpdateRequest implements TrainingSheetUpdatable {
 
 
     @Size(min = 1, max = 150, message = "O nome deve conter entre 1 e 150 caracteres")

@@ -3,7 +3,6 @@ package backend.training.mapper;
 import backend.training.dto.TrainingProgramResponse;
 import backend.training.model.entity.TrainingProgram;
 import backend.training.model.entity.TrainingSheet;
-import backend.user.model.entity.User;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,7 +21,7 @@ public class TrainingProgramMapper {
                 .active(program.getActive())
 //                .programOrder(program.getProgramOrder())
                 .student(toUserInfo(program.getStudent()))
-                .trainer(toUserInfo(program.getTrainer()))  // Pode ser null
+                .trainer(toUserInfo(program.getTrainer()))
                 .userId(program.getStudent().getId())
                 .trainerId(program.getTrainer() != null ? program.getTrainer().getId() : null)
                 .trainingSheets(toTrainingSheets(program))
@@ -34,7 +33,7 @@ public class TrainingProgramMapper {
     /**
      * Converte User para UserInfo
      */
-    private TrainingProgramResponse.Userinfo toUserInfo(User user) {
+    private TrainingProgramResponse.Userinfo toUserInfo(backend.user.model.entity.User user) {
         if (user == null) return null;
 
         return TrainingProgramResponse.Userinfo.builder()

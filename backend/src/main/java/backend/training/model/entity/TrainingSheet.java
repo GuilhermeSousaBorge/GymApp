@@ -1,7 +1,7 @@
 package backend.training.model.entity;
 
-import backend.training.dto.TrainingSheetUpdateRequest;
 import backend.training.model.enums.DayOfWeek;
+import backend.training.model.interfaces.TrainingSheetUpdatable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -71,7 +71,7 @@ public class TrainingSheet {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public void updateFrom(TrainingSheetUpdateRequest trainingSheetUpdateRequest) {
+    public void updateFrom(TrainingSheetUpdatable trainingSheetUpdateRequest) {
         if (trainingSheetUpdateRequest.getName() != null) {
             this.name = trainingSheetUpdateRequest.getName();
         }

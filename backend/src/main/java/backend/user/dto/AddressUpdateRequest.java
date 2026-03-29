@@ -1,5 +1,6 @@
 package backend.user.dto;
 
+import backend.user.model.interfaces.AddressUpdatable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressUpdateRequest {
+public class AddressUpdateRequest implements AddressUpdatable {
 
     private Integer number;
 

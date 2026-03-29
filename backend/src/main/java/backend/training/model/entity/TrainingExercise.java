@@ -1,7 +1,7 @@
 package backend.training.model.entity;
 
-import backend.training.dto.TrainingExerciseUpdateRequest;
 import backend.exercise.model.entity.Exercise;
+import backend.training.model.interfaces.TrainingExerciseUpdatable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -53,7 +53,7 @@ public class TrainingExercise {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public void updateFrom(TrainingExerciseUpdateRequest updated) {
+    public void updateFrom(TrainingExerciseUpdatable updated) {
         if (updated.getReps() != null) {
             this.reps = updated.getReps();
         }

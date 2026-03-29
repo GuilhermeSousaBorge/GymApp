@@ -3,9 +3,10 @@ package backend.exercise.controller;
 import backend.exercise.dto.ExerciseRequest;
 import backend.exercise.dto.ExerciseUpdateRequest;
 import backend.exercise.dto.ExerciseResponse;
+import backend.exercise.usecase.*;
 import backend.infrastructure.security.IsAdmin;
 import backend.infrastructure.security.IsAdminOrTrainer;
-import backend.exercise.service.ExerciseService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,14 @@ import java.util.List;
 @PreAuthorize("isAuthenticated()")
 public class ExerciseController {
 
-    private final ExerciseService exerciseService;
+    private final CreateExerciseUseCase createExerciseUseCase;
+    private final GetExerciseByIdUseCase getExerciseByIdUseCase;
+    private final SearchExercisesUseCase searchExercisesUseCase;
+    private final GetExerciseByCategoryUseCase getExerciseByCategoryUseCase;
+    private final ListActiveExercisesUseCase listActiveExercisesUseCase;
+    private final ListExercisesUseCase listExercisesUseCase;
+    private final UpdateExerciseUseCase updateExerciseUseCase;
+    private final DeleteExerciseUseCase deleteExerciseUseCase;
 
     /**
      * POST /api/exercises
@@ -43,7 +51,7 @@ public class ExerciseController {
 
         log.info("POST /api/exercises - Name: {}", request.getName());
 
-        ExerciseResponse response = exerciseService.createExercise(request);
+        ExerciseResponse response = createExerciseUseCase.execute(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -56,7 +64,7 @@ public class ExerciseController {
     public ResponseEntity<ExerciseResponse> getExerciseById(@PathVariable Long id) {
         log.info("GET /api/exercises/{}", id);
 
-        ExerciseResponse response = exerciseService.getExerciseById(id);
+        ExerciseResponse response = getExerciseByIdUseCase.execute(id);
 
         return ResponseEntity.ok(response);
     }
@@ -78,16 +86,16 @@ public class ExerciseController {
 
         if (search != null && !search.isBlank()) {
             // Busca por termo
-            response = exerciseService.searchExercises(search);
+            response = searchExercisesUseCase.execute(search);
         } else if (categoryId != null) {
             // Filtro por categoria
-            response = exerciseService.getExercisesByCategory(categoryId);
+            response = getExerciseByCategoryUseCase.execute(categoryId);
         } else if (activeOnly) {
             // Apenas ativos
-            response = exerciseService.listActiveExercises();
+            response = listActiveExercisesUseCase.execute();
         } else {
             // Todos
-            response = exerciseService.listAllExercises();
+            response = listExercisesUseCase.execute();
         }
 
         return ResponseEntity.ok(response);
@@ -105,7 +113,7 @@ public class ExerciseController {
 
         log.info("PUT /api/exercises/{}", id);
 
-        ExerciseResponse response = exerciseService.updateExercise(id, request);
+        ExerciseResponse response = updateExerciseUseCase.execute(id, request);
 
         return ResponseEntity.ok(response);
     }
@@ -119,7 +127,7 @@ public class ExerciseController {
     public ResponseEntity<Void> deleteExercise(@PathVariable Long id) {
         log.info("DELETE /api/exercises/{}", id);
 
-        exerciseService.deleteExercise(id);
+        deleteExerciseUseCase.execute(id);
 
         return ResponseEntity.noContent().build();
     }

@@ -1,5 +1,6 @@
 package backend.exercise.dto;
 
+import backend.exercise.model.interfaces.ExerciseUpdatable;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -8,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ExerciseUpdateRequest {
+public class ExerciseUpdateRequest implements ExerciseUpdatable {
 
     @Size(max = 150)
     private String name;

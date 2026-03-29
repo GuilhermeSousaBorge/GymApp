@@ -1,8 +1,6 @@
 package backend.training.mapper;
 
 import backend.training.dto.TrainingExerciseResponse;
-import backend.exercise.model.entity.Exercise;
-import backend.exercise.model.entity.ExerciseCategory;
 import backend.training.model.entity.TrainingExercise;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +24,7 @@ public class TrainingExerciseMapper {
                 .build();
     }
 
-    private TrainingExerciseResponse.ExerciseInfo toExerciseInfo(Exercise exercise) {
+    private TrainingExerciseResponse.ExerciseInfo toExerciseInfo(backend.exercise.model.entity.Exercise exercise) {
         if(exercise == null) return null;
 
         return TrainingExerciseResponse.ExerciseInfo.builder()
@@ -38,7 +36,7 @@ public class TrainingExerciseMapper {
                 .build();
     }
 
-    private TrainingExerciseResponse.ExerciseInfo.CategoryInfo toCategoryInfo(ExerciseCategory category) {
+    private TrainingExerciseResponse.ExerciseInfo.CategoryInfo toCategoryInfo(backend.exercise.model.entity.ExerciseCategory category) {
         if (category == null) return null;
 
         return TrainingExerciseResponse.ExerciseInfo.CategoryInfo.builder()

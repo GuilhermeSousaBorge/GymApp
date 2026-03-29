@@ -5,7 +5,7 @@ import backend.training.dto.TrainingExerciseUpdateRequest;
 import backend.training.dto.TrainingExerciseResponse;
 import backend.infrastructure.security.ExerciseOwnerOrAdmin;
 import backend.infrastructure.security.SheetOwnerOrAdmin;
-import backend.training.service.TrainingExerciseService;
+import backend.training.usecase.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,12 @@ import java.util.List;
 @PreAuthorize("isAuthenticated()")
 public class TrainingExerciseController {
 
-    private final TrainingExerciseService exerciseService;
+    private final CreateExerciseUseCase createExerciseUseCase;
+    private final GetExerciseByIdUseCase getExerciseByIdUseCase;
+    private final GetSheetExercisesUseCase getSheetExercisesUseCase;
+    private final UpdateExerciseUseCase updateExerciseUseCase;
+    private final ReorderExerciseUseCase reorderExerciseUseCase;
+    private final DeleteExerciseUseCase deleteExerciseUseCase;
 
     /**
      * POST /api/training-exercises/{TrainingExerciseId}
@@ -35,7 +40,7 @@ public class TrainingExerciseController {
 
         log.info("POST /api/training-sheets");
 
-        TrainingExerciseResponse response = exerciseService.createTrainingExercise(request);
+        TrainingExerciseResponse response = createExerciseUseCase.execute(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -49,7 +54,7 @@ public class TrainingExerciseController {
     public ResponseEntity<TrainingExerciseResponse> getExerciseById(@PathVariable Long exerciseId) {
         log.info("GET /api/training-exercises/{}", exerciseId);
 
-        TrainingExerciseResponse response = exerciseService.getTrainingExerciseById(exerciseId);
+        TrainingExerciseResponse response = getExerciseByIdUseCase.execute(exerciseId);
 
         return ResponseEntity.ok(response);
     }
@@ -64,7 +69,7 @@ public class TrainingExerciseController {
             @RequestParam() Long sheetId) {
         log.info("GET /api/training-exercises/{}", sheetId);
 
-        List<TrainingExerciseResponse> response = exerciseService.getExercisesFromSheet(sheetId);
+        List<TrainingExerciseResponse> response = getSheetExercisesUseCase.execute(sheetId);
 
         return ResponseEntity.ok(response);
     }
@@ -81,7 +86,7 @@ public class TrainingExerciseController {
 
         log.info("PUT /api/training-exercises/{}", exerciseId);
 
-        TrainingExerciseResponse response = exerciseService.updateTrainingExercise(exerciseId, request);
+        TrainingExerciseResponse response = updateExerciseUseCase.execute(exerciseId, request);
 
         return ResponseEntity.ok(response);
     }
@@ -98,7 +103,7 @@ public class TrainingExerciseController {
 
         log.info("PATCH /api/training-exercises/{}/reorder - Order: {}", exerciseId, newOrder);
 
-        TrainingExerciseResponse response = exerciseService.reorderExercise(exerciseId, newOrder);
+        TrainingExerciseResponse response = reorderExerciseUseCase.execute(exerciseId, newOrder);
 
         return ResponseEntity.ok(response);
     }
@@ -112,7 +117,7 @@ public class TrainingExerciseController {
     public ResponseEntity<Void> deleteExercise(@PathVariable Long exerciseId) {
         log.info("DELETE /api/training-exercises/{}", exerciseId);
 
-        exerciseService.deleteTrainingExercise(exerciseId);
+        deleteExerciseUseCase.execute(exerciseId);
 
         return ResponseEntity.noContent().build();
     }

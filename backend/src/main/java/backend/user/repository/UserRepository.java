@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,8 +25,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * existsByEmail → SELECT COUNT(*) > 0 FROM users WHERE email = ?
      */
     boolean existsByEmail(Email email);
+    boolean existsByEmailAndIdNot(Email email, Long id);
 
     boolean existsByCpf(Cpf cpf);
+    boolean existsByCpfAndIdNot(Cpf cpf, Long id);
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.role.name = 'Aluno' AND u.active = true")
     int countByActiveTrue();

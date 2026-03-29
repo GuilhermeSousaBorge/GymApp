@@ -1,6 +1,5 @@
 package backend.user.model.entity;
 
-import backend.user.dto.UserRequest;
 import backend.user.model.converters.CpfConverter;
 import backend.user.model.converters.EmailConverter;
 import backend.user.model.converters.PasswordConverter;
@@ -108,6 +107,14 @@ public class User {
 
     public boolean isPasswordValid(String rawPassword, PasswordEncoder encoder) {
         return this.passwordHash.matches(rawPassword, encoder);
+    }
+
+    public Address getAddress() {
+        return this.address;
+    }
+
+    public Role getRole() {
+        return this.role;
     }
 
     public void updateForm(UserUpdatable request){

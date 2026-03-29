@@ -6,7 +6,7 @@ import backend.training.dto.TrainingSheetResponse;
 import backend.infrastructure.security.ProgramOwnerOrAdmin;
 import backend.infrastructure.security.SheetOwnerOrAdmin;
 import backend.training.model.enums.DayOfWeek;
-import backend.training.service.TrainingSheetService;
+import backend.training.usecase.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,16 @@ import java.util.List;
 @PreAuthorize("isAuthenticated()")
 public class TrainingSheetController {
 
-    private final TrainingSheetService sheetService;
+    private final CreateSheetUseCase createSheetUseCase;
+    private final GetSheetByIdUseCase getSheetByIdUseCase;
+    private final GetSheetByDayOfWeekUseCase getSheetByDayOfWeekUseCase;
+    private final GetSheetFromProgramUseCase getSheetFromProgramUseCase;
+    private final GetActiveSheetsFromProgramUseCase getActiveSheetsFromProgramUseCase;
+    private final UpdateSheetUseCase updateSheetUseCase;
+    private final ReorderSheetUseCase reorderSheetUseCase;
+    private final ActivateSheetUseCase activateSheetUseCase;
+    private final DeactivateSheetUseCase deactivateSheetUseCase;
+    private final DeleteSheetUseCase deleteSheetUseCase;
 
     /**
      * POST /api/training-sheets
@@ -47,7 +56,7 @@ public class TrainingSheetController {
         log.info("POST /api/training-sheets - Name: {}, Program: {}",
                 request.getName(), request.getTrainingProgramId());
 
-        TrainingSheetResponse response = sheetService.createSheet(request);
+        TrainingSheetResponse response = createSheetUseCase.execute(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -61,7 +70,7 @@ public class TrainingSheetController {
     public ResponseEntity<TrainingSheetResponse> getSheetById(@PathVariable Long sheetId) {
         log.info("GET /api/training-sheets/{}", sheetId);
 
-        TrainingSheetResponse response = sheetService.getSheetById(sheetId);
+        TrainingSheetResponse response = getSheetByIdUseCase.execute(sheetId);
 
         return ResponseEntity.ok(response);
     }
@@ -96,32 +105,16 @@ public class TrainingSheetController {
         if (programId != null) {
             // Filtrar por programa
             response = activeOnly
-                    ? sheetService.getActiveSheetsFromProgram(programId)
-                    : sheetService.getSheetsFromProgram(programId);
+                    ? getActiveSheetsFromProgramUseCase.execute(programId)
+                    : getSheetFromProgramUseCase.execute(programId);
         } else if (dayOfWeek != null) {
             // Filtrar por dia da semana
-            response = sheetService.getSheetsByDayOfWeek(dayOfWeek);
+            response = getSheetByDayOfWeekUseCase.execute(dayOfWeek);
         }
 
         return ResponseEntity.ok(response);
     }
 
-//    /**
-//     * GET /api/training-sheets/day/{dayOfWeek}
-//     * Buscar folhas que treinam em determinado dia
-//     *
-//     * dayOfWeek: MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
-//     */
-//    @GetMapping("/day/{dayOfWeek}")
-//    public ResponseEntity<List<TrainingSheetResponse>> getSheetsByDay(
-//            @PathVariable DayOfWeek dayOfWeek) {
-//
-//        log.info("GET /api/training-sheets/day/{}", dayOfWeek);
-//
-//        List<TrainingSheetResponse> response = sheetService.getSheetsByDayOfWeek(dayOfWeek);
-//
-//        return ResponseEntity.ok(response);
-//    }
 
     /**
      * PUT /api/training-sheets/{id}
@@ -144,7 +137,7 @@ public class TrainingSheetController {
 
         log.info("PUT /api/training-sheets/{}", sheetId);
 
-        TrainingSheetResponse response = sheetService.updateSheet(sheetId, request);
+        TrainingSheetResponse response = updateSheetUseCase.execute(sheetId, request);
 
         return ResponseEntity.ok(response);
     }
@@ -166,7 +159,7 @@ public class TrainingSheetController {
 
         log.info("PATCH /api/training-sheets/{}/reorder - Order: {}", sheetId, newOrder);
 
-        TrainingSheetResponse response = sheetService.reorderSheet(sheetId, newOrder);
+        TrainingSheetResponse response = reorderSheetUseCase.execute(sheetId, newOrder);
 
         return ResponseEntity.ok(response);
     }
@@ -180,7 +173,7 @@ public class TrainingSheetController {
     public ResponseEntity<Void> activateSheet(@PathVariable Long sheetId) {
         log.info("PATCH /api/training-sheets/{}/activate", sheetId);
 
-        sheetService.activateSheet(sheetId);
+        activateSheetUseCase.execute(sheetId);
 
         return ResponseEntity.noContent().build();
     }
@@ -194,7 +187,7 @@ public class TrainingSheetController {
     public ResponseEntity<Void> deactivateSheet(@PathVariable Long sheetId) {
         log.info("PATCH /api/training-sheets/{}/deactivate", sheetId);
 
-        sheetService.deactivateSheet(sheetId);
+        deactivateSheetUseCase.execute(sheetId);
 
         return ResponseEntity.noContent().build();
     }
@@ -208,7 +201,7 @@ public class TrainingSheetController {
     public ResponseEntity<Void> deleteSheet(@PathVariable Long sheetId) {
         log.info("DELETE /api/training-sheets/{}", sheetId);
 
-        sheetService.deleteSheet(sheetId);
+        deleteSheetUseCase.execute(sheetId);
 
         return ResponseEntity.noContent().build();
     }

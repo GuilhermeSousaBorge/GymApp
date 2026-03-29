@@ -1,6 +1,6 @@
 package backend.training.model.entity;
 
-import backend.training.dto.TrainingProgramUpdateRequest;
+import backend.training.model.interfaces.TrainingProgramUpdatable;
 import backend.user.model.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -54,7 +54,7 @@ public class TrainingProgram {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public void updateFrom(TrainingProgramUpdateRequest request) {
+    public void updateFrom(TrainingProgramUpdatable request) {
         if (request.getName() != null) this.name = request.getName();
         if (request.getDescription() != null) this.description = request.getDescription();
     }

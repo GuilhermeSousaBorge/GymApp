@@ -4,10 +4,10 @@ import backend.auth.dto.LoginRequest;
 import backend.auth.dto.RegisterRequest;
 import backend.auth.dto.AuthResponse;
 import backend.auth.dto.LoginResponse;
+import backend.auth.usecase.LoginUseCase;
+import backend.auth.usecase.MeUseCase;
+import backend.auth.usecase.RegisterUseCase;
 import backend.user.dto.UserResponse;
-import backend.auth.service.AuthService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,12 +38,15 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class AuthController {
 
-    private final AuthService authService;
     @Value("${jwt.expiration}")
     private Long jwtExpiration;
 
     @Value("${cookie.secure}")
     private Boolean secure;
+
+    private final LoginUseCase loginUseCase;
+    private final RegisterUseCase registerUseCase;
+    private final MeUseCase meUseCase;
 
     /**
      * ENDPOINT: POST /api/auth/login
@@ -80,7 +83,7 @@ public class AuthController {
                                               HttpServletResponse response) {
         log.info("POST /api/auth/login - Email: {}", request.getEmail());
 
-        LoginResponse login = authService.login(request);
+        LoginResponse login = loginUseCase.execute(request);
 
         addTokenCookie(response, login.getToken());
 
@@ -121,7 +124,7 @@ public class AuthController {
                                                   HttpServletResponse response) {
         log.info("POST /api/auth/register - Email: {}", request.getEmail());
 
-        LoginResponse register = authService.register(request);
+        LoginResponse register = registerUseCase.execute(request);
 
         addTokenCookie(response, register.getToken());
 
@@ -132,7 +135,7 @@ public class AuthController {
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserResponse> me(Authentication authentication){
-        return ResponseEntity.ok(authService.me(authentication));
+        return ResponseEntity.ok(meUseCase.execute(authentication));
     }
 
     /**

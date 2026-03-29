@@ -1,6 +1,6 @@
 package backend.exercise.model.entity;
 
-import backend.exercise.dto.ExerciseCategoryUpdateRequest;
+import backend.exercise.model.interfaces.ExerciseCategoryUpdatable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -45,7 +45,7 @@ public class ExerciseCategory {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public void updateFrom(ExerciseCategoryUpdateRequest updatedCategory) {
+    public void updateFrom(ExerciseCategoryUpdatable updatedCategory) {
         if (updatedCategory.getMuscleGroup() != null) {
             this.muscleGroup = updatedCategory.getMuscleGroup();
         }

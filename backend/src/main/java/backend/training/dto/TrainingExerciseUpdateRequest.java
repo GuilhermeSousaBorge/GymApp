@@ -1,5 +1,6 @@
 package backend.training.dto;
 
+import backend.training.model.interfaces.TrainingExerciseUpdatable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -10,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TrainingExerciseUpdateRequest {
+public class TrainingExerciseUpdateRequest implements TrainingExerciseUpdatable {
 
     @Size(max = 50)
     private String reps;

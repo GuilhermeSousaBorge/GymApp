@@ -1,8 +1,6 @@
 package backend.dashboard.dto;
 
-import backend.training.dto.TrainingProgramResponse;
 import backend.training.dto.TrainingSheetResponse;
-import backend.training.model.entity.TrainingProgram;
 import lombok.*;
 
 import java.util.List;

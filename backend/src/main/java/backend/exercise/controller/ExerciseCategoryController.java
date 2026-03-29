@@ -3,9 +3,9 @@ package backend.exercise.controller;
 import backend.exercise.dto.ExerciseCategoryRequest;
 import backend.exercise.dto.ExerciseCategoryUpdateRequest;
 import backend.exercise.dto.ExerciseCategoryResponse;
+import backend.exercise.usecase.*;
 import backend.infrastructure.security.IsAdmin;
 import backend.infrastructure.security.IsAdminOrTrainer;
-import backend.exercise.service.ExerciseCategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,12 @@ import java.util.List;
 @PreAuthorize("isAuthenticated()")
 public class ExerciseCategoryController {
 
-    private final ExerciseCategoryService categoryService;
+    private final CreateCategoryUseCase createCategoryUseCase;
+    private final GetCategoryByIdUseCase getCategoryByIdUseCase;
+    private final ListCategoriesUseCase listCategoriesUseCase;
+    private final ListActiveCategoriesUseCase listActiveCategoriesUseCase;
+    private final UpdateCategoryUseCase updateCategoryUseCase;
+    private final DeleteCategoryUseCase deleteCategoryUseCase;
 
     /**
      * POST /api/exercise-categories
@@ -43,7 +48,7 @@ public class ExerciseCategoryController {
 
         log.info("POST /api/exercise-categories - Grupo muscular: {}", request.getMuscleGroup());
 
-        ExerciseCategoryResponse response = categoryService.createCategory(request);
+        ExerciseCategoryResponse response = createCategoryUseCase.execute(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -56,7 +61,7 @@ public class ExerciseCategoryController {
     public ResponseEntity<ExerciseCategoryResponse> getCategoryById(@PathVariable Long id) {
         log.info("GET /api/exercise-categories/{}", id);
 
-        ExerciseCategoryResponse response = categoryService.getCategoryById(id);
+        ExerciseCategoryResponse response = getCategoryByIdUseCase.execute(id);
 
         return ResponseEntity.ok(response);
     }
@@ -72,8 +77,8 @@ public class ExerciseCategoryController {
         log.info("GET /api/exercise-categories - activeOnly: {}", activeOnly);
 
         List<ExerciseCategoryResponse> response = activeOnly
-                ? categoryService.listActiveCategories()
-                : categoryService.listAllCategories();
+                ? listActiveCategoriesUseCase.execute()
+                : listCategoriesUseCase.execute();
 
         return ResponseEntity.ok(response);
     }
@@ -90,7 +95,7 @@ public class ExerciseCategoryController {
 
         log.info("PUT /api/exercise-categories/{}", id);
 
-        ExerciseCategoryResponse response = categoryService.updateCategory(id, request);
+        ExerciseCategoryResponse response = updateCategoryUseCase.execute(id, request);
 
         return ResponseEntity.ok(response);
     }
@@ -104,7 +109,7 @@ public class ExerciseCategoryController {
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         log.info("DELETE /api/exercise-categories/{}", id);
 
-        categoryService.deleteCategory(id);
+        deleteCategoryUseCase.execute(id);
 
         return ResponseEntity.noContent().build();
     }

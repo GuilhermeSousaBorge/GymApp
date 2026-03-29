@@ -4,7 +4,7 @@ import backend.training.dto.TrainingProgramRequest;
 import backend.training.dto.TrainingProgramUpdateRequest;
 import backend.training.dto.TrainingProgramResponse;
 import backend.infrastructure.security.ProgramOwnerOrAdmin;
-import backend.training.service.TrainingProgramService;
+import backend.training.usecase.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,13 @@ import java.util.List;
 @PreAuthorize("isAuthenticated()")
 public class TrainingProgramController {
 
-    private final TrainingProgramService trainingProgramService;
+    private final CreateProgramUseCase createProgramUseCase;
+    private final GetProgramByIdUseCase getProgramByIdUseCase;
+    private final ListProgramUseCase listProgramUseCase;
+    private final UpdateProgramUseCase updateProgramUseCase;
+    private final ActivateProgramUseCase activateProgramUseCase;
+    private final DeactivateProgramUseCase deactivateProgramUseCase;
+    private final DeleteProgramUseCase deleteProgramUseCase;
 
     @PostMapping
     public ResponseEntity<TrainingProgramResponse> createProgram(
@@ -31,7 +37,7 @@ public class TrainingProgramController {
         log.info("POST /api/training-programs - Student: {}",
                 request.getUserId());
 
-        TrainingProgramResponse response = trainingProgramService.createTrainingProgram(request);
+        TrainingProgramResponse response = createProgramUseCase.execute(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -45,7 +51,7 @@ public class TrainingProgramController {
     public ResponseEntity<TrainingProgramResponse> getProgramById(@PathVariable Long programId) {
         log.info("GET /api/training-programs/{}", programId);
 
-        TrainingProgramResponse response = trainingProgramService.getTrainingProgramById(programId);
+        TrainingProgramResponse response = getProgramByIdUseCase.execute(programId);
 
         return ResponseEntity.ok(response);
     }
@@ -59,7 +65,7 @@ public class TrainingProgramController {
     public ResponseEntity<List<TrainingProgramResponse>> getAllPrograms(@RequestParam (required = false) Long userId) {
         log.info("GET /api/training-programs/all");
 
-        List<TrainingProgramResponse> response = trainingProgramService.listTrainingPrograms(userId);
+        List<TrainingProgramResponse> response = listProgramUseCase.execute(userId);
 
         return ResponseEntity.ok(response);
     }
@@ -76,7 +82,7 @@ public class TrainingProgramController {
 
         log.info("PUT /api/training-programs/{}", programId);
 
-        TrainingProgramResponse response = trainingProgramService.updateTrainingPrograms(programId, request);
+        TrainingProgramResponse response = updateProgramUseCase.execute(programId, request);
 
         return ResponseEntity.ok(response);
     }
@@ -90,7 +96,7 @@ public class TrainingProgramController {
     public ResponseEntity<Void> deactivateProgram(@PathVariable Long programId) {
         log.info("PATCH /api/training-programs/{}/deactivate", programId);
 
-        trainingProgramService.deactivateProgram(programId);
+        deactivateProgramUseCase.execute(programId);
 
         return ResponseEntity.noContent().build();
     }
@@ -100,7 +106,7 @@ public class TrainingProgramController {
     public ResponseEntity<Void> activateProgram(@PathVariable Long programId) {
         log.info("PATCH /api/training-programs/{}/activate", programId);
 
-        trainingProgramService.activateProgram(programId);
+        activateProgramUseCase.execute(programId);
 
         return ResponseEntity.noContent().build();
     }
@@ -114,7 +120,7 @@ public class TrainingProgramController {
     public ResponseEntity<Void> deleteProgram(@PathVariable Long programId) {
         log.info("DELETE /api/training-programs/{}", programId);
 
-        trainingProgramService.deleteProgram(programId);
+        deleteProgramUseCase.execute(programId);
 
         return ResponseEntity.noContent().build();
     }

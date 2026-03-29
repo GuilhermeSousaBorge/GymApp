@@ -1,6 +1,6 @@
 package backend.user.model.entity;
 
-import backend.user.dto.AddressUpdateRequest;
+import backend.user.model.interfaces.AddressUpdatable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,7 +34,35 @@ public class Address {
     @Column(length = 2)  // Sigla do estado (MG, SP, etc)
     private String state;
 
-    public void updateFrom(AddressUpdateRequest request) {
+    public Long getId() {
+        return id;
+    }
+
+    public Integer getNumber() {
+        return number;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public String getStreetName() {
+        return streetName;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void updateFrom(AddressUpdatable request) {
         if (request.getNumber() != null) this.number = request.getNumber();
         if (request.getZipCode() != null) this.zipCode = request.getZipCode();
         if (request.getDistrict() != null) this.district = request.getDistrict();

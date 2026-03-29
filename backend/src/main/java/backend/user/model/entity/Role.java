@@ -30,4 +30,20 @@ public class Role {
     @Enumerated(EnumType.STRING)
     @Column(name = "permission", nullable = false)
     private Set<Permission> permissions;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Set<Permission> getPermissions() {
+        return permissions;
+    }
 }

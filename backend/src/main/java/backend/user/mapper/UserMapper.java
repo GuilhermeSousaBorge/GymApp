@@ -56,12 +56,12 @@ public class UserMapper {
             return null;
         }
 
-        return UserResponse.RoleInfo.builder()
-                .id(user.getRole().getId())
-                .name(user.getRole().getName())
-                .description(user.getRole().getDescription())
-                .permissions(user.getRole().getPermissions())
-                .build();
+        UserResponse.RoleInfo roleInfo = new UserResponse.RoleInfo();
+        roleInfo.setId(user.getRole().getId());
+        roleInfo.setName(user.getRole().getName());
+        roleInfo.setDescription(user.getRole().getDescription());
+        roleInfo.setPermissions(user.getRole().getPermissions());
+        return roleInfo;
     }
 
     /**
@@ -72,14 +72,14 @@ public class UserMapper {
             return null;
         }
 
-        return UserResponse.AddressInfo.builder()
-                .id(user.getAddress().getId())
-                .number(user.getAddress().getNumber())
-                .zipCode(user.getAddress().getZipCode())
-                .district(user.getAddress().getDistrict())
-                .streetName(user.getAddress().getStreetName())
-                .city(user.getAddress().getCity())
-                .state(user.getAddress().getState())
-                .build();
+        UserResponse.AddressInfo addressInfo = new UserResponse.AddressInfo();
+        addressInfo.setId(user.getAddress().getId());
+        addressInfo.setNumber(user.getAddress().getNumber());
+        addressInfo.setZipCode(user.getAddress().getZipCode());
+        addressInfo.setDistrict(user.getAddress().getDistrict());
+        addressInfo.setStreetName(user.getAddress().getStreetName());
+        addressInfo.setCity(user.getAddress().getCity());
+        addressInfo.setState(user.getAddress().getState());
+        return addressInfo;
     }
 }

@@ -1,5 +1,6 @@
 package backend.training.dto;
 
+import backend.training.model.interfaces.TrainingProgramUpdatable;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -8,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TrainingProgramUpdateRequest {
+public class TrainingProgramUpdateRequest implements TrainingProgramUpdatable {
 
     @Size(max = 150, message = "O nome do programa de treinamento deve ter no máximo 150 caracteres.")
     private String name;

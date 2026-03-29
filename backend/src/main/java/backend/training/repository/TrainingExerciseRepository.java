@@ -39,4 +39,6 @@ public interface TrainingExerciseRepository extends JpaRepository<TrainingExerci
     boolean existsByExerciseId(Long exerciseId);
 
     int countByTrainingSheetId(Long trainingSheetId);
+
+    boolean existsByTrainingSheetId(Long sheetId);
 }

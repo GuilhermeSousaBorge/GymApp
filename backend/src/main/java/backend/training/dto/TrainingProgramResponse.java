@@ -1,7 +1,5 @@
 package backend.training.dto;
 
-import backend.training.model.entity.TrainingSheet;
-import backend.user.model.entity.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -44,11 +42,6 @@ public class TrainingProgramResponse {
     public static class Userinfo {
         private Long id;
         private String name;
-
-        public Userinfo(User user) {
-            this.id = user.getId();
-            this.name = user.getName();
-        }
     }
 
     @Getter
@@ -62,13 +55,5 @@ public class TrainingProgramResponse {
         private String description;
         private Integer orderInProgram;
         private boolean active;
-
-        public TrainingSheetInfo(TrainingSheet trainingSheet) {
-            this.id = trainingSheet.getId();
-            this.name = trainingSheet.getName();
-            this.description = trainingSheet.getDescription();
-            this.orderInProgram = trainingSheet.getOrderInProgram();
-            this.active = trainingSheet.getActive();
-        }
     }
 }
