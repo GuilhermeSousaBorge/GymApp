@@ -1,0 +1,33 @@
+-- -- =============================================================================
+-- -- V9__create_table_plan.sql
+-- -- =============================================================================
+-- -- Cria tabela de planos de assinatura do sistema.
+-- -- Fase 4 (OCP): cada plano define limites usados pela PlanPolicy.
+-- -- =============================================================================
+--
+-- CREATE TABLE plans (
+--     id           BIGSERIAL     PRIMARY KEY,
+--     name         VARCHAR(100)  NOT NULL UNIQUE,
+--     description  TEXT,
+--     price        NUMERIC(10,2) NOT NULL,
+--     max_students INT           NOT NULL DEFAULT 0,
+--     max_programs INT           NOT NULL DEFAULT 1,
+--     active       BOOLEAN       NOT NULL DEFAULT TRUE,
+--     created_at   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     updated_at   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP
+-- );
+--
+-- CREATE TRIGGER trg_plans_updated_at
+--     BEFORE UPDATE ON plans
+--     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+--
+-- CREATE INDEX idx_plans_name   ON plans(name);
+-- CREATE INDEX idx_plans_active ON plans(active);
+--
+-- -- Seed: planos iniciais do sistema
+-- INSERT INTO plans (name, description, price, max_students, max_programs, active)
+-- VALUES
+--     ('Free',    'Plano gratuito — até 5 alunos e 1 programa por aluno.',        0.00,   5,  1, TRUE),
+--     ('Basic',   'Plano básico — até 20 alunos e 3 programas por aluno.',       49.90,  20,  3, TRUE),
+--     ('Premium', 'Plano premium — alunos ilimitados e programas ilimitados.', 149.90, 999, 99, TRUE);
+--

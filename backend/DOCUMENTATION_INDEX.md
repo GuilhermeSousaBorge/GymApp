@@ -1,7 +1,7 @@
 # Documentacao - Indice Atual (Mar/2026)
 
 Projeto: `backend` (GymApp)  
-Status SOLID: Fase 1 concluida, Fase 2 concluida no fluxo HTTP, Fase 3 concluida
+Status SOLID: Fase 1 concluida, Fase 2 concluida no fluxo HTTP, Fase 3 concluida, Fase 4 em execucao (base concluida, continuidade em hardening)
 
 ## Leia primeiro
 
@@ -23,12 +23,18 @@ Status SOLID: Fase 1 concluida, Fase 2 concluida no fluxo HTTP, Fase 3 concluida
 - Checklist pos-fechamento da fase
 - Base para manutencao e limpeza residual
 
+6. `SOLID_PHASE_4_CONTINUITY.md`
+- Guia de continuidade da Fase 4 (slices, checklist de PR, validacao)
+
 ## Fonte de verdade (manter atualizada)
 
 - `AGENTS.md`
 - `SOLID_REFACTORING_STATUS.md`
 - `SOLID_PHASE_3_PLAN.md`
 - `SOLID_PHASE_3_SUMMARY.md`
+- `SOLID_PHASE_4_PLAN.md`
+- `SOLID_PHASE_4_CONTINUITY.md`
+- `SOLID_PHASE_4_SUMMARY.md`
 - `DOCUMENTATION_INDEX.md`
 
 ## Documentos historicos (nao usar como referencia principal)
@@ -74,7 +80,9 @@ Set-Location "C:\Users\Guilherme\Desktop\Workspace\GymApp\backend"
 
 ## Proximo bloco de trabalho recomendado
 
-- Fase 4 / extensibilidade (OCP):
-  - definir estrategias/fabricas para fluxos com variacao de regra;
-  - manter contratos atuais de UseCase/DTO sem breaking change;
-  - priorizar entregas incrementais com validacao por modulo.
+- Fase 4 / extensibilidade (OCP) — **implementacao base concluida**:
+  - `plan`: CRUD completo em UseCases + Ports + Adapter + Controller.
+  - `subscription`: `Create`, `Cancel`, `GetActiveByUser`.
+  - `payment`: `Create`, `MarkAsPaid`, `ListBySubscription`.
+  - migracoes novas: `V10`, `V11`, `V12`.
+- Proximo foco: seguir `SOLID_PHASE_4_CONTINUITY.md` para hardening de regras, cobertura negativa e consistencia de fronteiras.

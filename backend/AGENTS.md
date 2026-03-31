@@ -1,120 +1,54 @@
-# GymApp Backend - AI Agent Guidelines (Atualizado)
+# GymApp Backend - AGENTS Guide
 
-## Quick Context
+## Quick context
+- Stack: Java 17, Spring Boot 4.0.2, Maven Wrapper (`mvnw.cmd`).
+- Default profile: `dev` (`src/main/resources/application.yaml`).
+- Local DB: PostgreSQL at `localhost:5433` (`docker-compose.yml`).
+- Active architecture baseline: Fase 2 + 3 concluida; Fase 4 em andamento (`SOLID_REFACTORING_STATUS.md`).
 
-- Linguagem: Java 17
-- Framework: Spring Boot 4.0.2
-- Build: Maven Wrapper (`mvnw.cmd` no Windows)
-- Banco local: PostgreSQL em `localhost:5433` (`docker-compose.yml`)
-- Perfil padrao local: `dev`
+## Golden flow (do not bypass)
+- HTTP path is `Controller -> UseCase -> Port -> Adapter/Repository -> Entity -> Mapper -> DTO`.
+- Controllers only orchestrate HTTP/security; business rules stay in UseCases.
+- UseCases use ports, not repositories directly (see `src/main/java/backend/*/usecase`).
+- API responses are DTOs, not entities (see `PlanController`, `PaymentController`).
 
-## Arquitetura em uso
+## Mandatory UseCase rules
+- One public method only: `execute(...)`.
+- Reads: `@Transactional(readOnly = true)`; writes: `@Transactional`.
+- Start `execute(...)` with `log.info(...)`.
+- Keep responsibility narrow (one action per UseCase).
+- Follow naming `{Verb}{Noun}UseCase` (Get/List/Create/Update/Delete/Activate/Deactivate/Reorder).
 
-Fluxo principal:
+## Cross-module boundaries already enforced
+- User plan relation is indirect: `User -> Subscription -> Plan`.
+- Payment links to subscription (`payments.subscription_id`), not user directly.
+- Avoid cross-module repository coupling; expose a port instead.
+- Example: `exercise` checks usage via `ExerciseUsagePort`; implemented in `training` by `TrainingExerciseUsageAdapter`.
 
-`Controller -> UseCase -> Repository/Port -> Entity -> Mapper -> DTO`
+## Known pitfalls from this codebase
+- Duplicate UseCase names across modules require explicit bean names.
+- Example in code: `@Service("trainingCreateExerciseUseCase")` vs `@Service("exerciseCreateExerciseUseCase")`.
+- Spring Data derived queries must match field names exactly.
+- Example: `existsByTrainingSheetId(Long sheetId)`.
 
-Estado atual:
-- Fase 2 do SOLID concluida no fluxo HTTP.
-- Fase 3 concluida (migracao repository -> port consolidada nos UseCases principais).
-- Controllers principais nao dependem mais de `*Service` para regras de dominio.
-- Services legados nao devem ser reintroduzidos no fluxo HTTP.
+## OCP pattern in phase 4
+- Plan variability uses one Strategy level: `PlanPolicy` + `PlanPolicyResolver`.
+- Add new plan behavior by creating a new `PlanPolicy` implementation; avoid changing existing UseCase contracts.
+- Reference: `src/main/java/backend/plan/policy/PlanPolicy.java` and `PlanPolicyResolver.java`.
 
-## Regras obrigatorias para novos changes
-
-1. Um UseCase = uma responsabilidade.
-2. Um unico metodo publico por UseCase: `execute(...)`.
-3. Read: `@Transactional(readOnly = true)`.
-4. Write: `@Transactional`.
-5. `log.info(...)` no inicio do `execute(...)`.
-6. Controller apenas orquestra HTTP (sem regra de negocio complexa).
-7. API responde DTO, nao entidade.
-
-## Convencoes de nomenclatura
-
-- UseCase: `{Verb}{Noun}UseCase` (ex.: `GetUserByIdUseCase`, `UpdateProgramUseCase`).
-- Evite nomes ambiguos; padronize verbo (`Get`, `List`, `Create`, `Update`, `Delete`, `Activate`, `Deactivate`, `Reorder`).
-
-## Pontos criticos ja encontrados no projeto
-
-### 1) Conflito de bean name entre modulos
-
-Existem UseCases com mesmo nome em `training` e `exercise` (ex.: `CreateExerciseUseCase`).
-Quando houver duplicidade cross-modulo, use nome explicito no `@Service("...")`.
-
-Exemplo ja aplicado:
-
-```java
-@Service("trainingCreateExerciseUseCase")
-public class CreateExerciseUseCase { ... }
-
-@Service("exerciseCreateExerciseUseCase")
-public class CreateExerciseUseCase { ... }
-```
-
-### 2) Methods derivadas do Spring Data
-
-Respeite naming convention estrita para query derivada.
-
-Exemplo valido:
-
-```java
-boolean existsByTrainingSheetId(Long sheetId);
-```
-
-## Exemplo de UseCase alinhado ao estado atual
-
-```java
-@Service
-@Slf4j
-@RequiredArgsConstructor
-public class ReorderSheetUseCase {
-
-    private final TrainingSheetQueryPort queryPort;
-    private final TrainingSheetCommandPort commandPort;
-    private final TrainingSheetMapper mapper;
-
-    @Transactional
-    public TrainingSheetResponse execute(Long sheetId, Integer newOrder) {
-        log.info("Alterando ordem da folha {} para {}", sheetId, newOrder);
-
-        if (newOrder == null || newOrder < 1) {
-            throw new BadRequestException("Ordem deve ser maior que 0");
-        }
-
-        TrainingSheet sheet = queryPort.findById(sheetId)
-            .orElseThrow(() -> new BadRequestException("Ficha de treino nao encontrada"));
-
-        sheet.setOrderInProgram(newOrder);
-        TrainingSheet saved = commandPort.update(sheet);
-        return mapper.toResponse(saved);
-    }
-}
-```
-
-## Modulos e estado atual
-
-- `user`: concluido em UseCases no controller.
-- `auth`: concluido em UseCases no controller.
-- `training`: concluido em UseCases no controller, incluindo reorder.
-- `exercise`: concluido em UseCases no controller.
-- `dashboard`: concluido em UseCases no controller.
-
-## O que priorizar depois da Fase 3
-
-1. Planejar e executar Fase 4 (OCP), focando extensibilidade sem quebrar contratos.
-2. Consolidar backlog de melhoria continua (testes negativos adicionais, pequenos ajustes de fronteira).
-3. Manter padrao UseCase + Port para novos fluxos.
-
-## Comandos de validacao (Windows PowerShell)
-
+## Dev workflows (PowerShell)
 ```powershell
 Set-Location "C:\Users\Guilherme\Desktop\Workspace\GymApp\backend"
+docker compose up -d
 .\mvnw.cmd -q clean -DskipTests compile
-.\mvnw.cmd -q "-Dtest=backend.user.usecase.*Test,backend.auth.usecase.*Test,backend.dashboard.usecase.*Test,backend.training.usecase.*Test,backend.exercise.usecase.*Test" test
+.\mvnw.cmd -q "-Dtest=backend.user.usecase.*Test,backend.auth.usecase.*Test,backend.dashboard.usecase.*Test,backend.training.usecase.*Test,backend.exercise.usecase.*Test,backend.plan.usecase.*Test,backend.subscription.usecase.*Test,backend.payment.usecase.*Test" test
 ```
 
-## Referencias internas
-
-- Status atual: `SOLID_REFACTORING_STATUS.md`
-- Navegacao de docs: `DOCUMENTATION_INDEX.md`
+## Key files to read before changing code
+- `SOLID_REFACTORING_STATUS.md`
+- `SOLID_PHASE_4_PLAN.md`
+- `src/main/java/backend/plan/controller/PlanController.java`
+- `src/main/java/backend/subscription/usecase/CreateSubscriptionUseCase.java`
+- `src/main/java/backend/payment/usecase/CreatePaymentUseCase.java`
+- `src/main/resources/db/migration/V11__create_table_subscriptions.sql`
+- `src/main/resources/db/migration/V12__create_table_payments.sql`

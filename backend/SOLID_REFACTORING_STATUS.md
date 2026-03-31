@@ -258,6 +258,37 @@ Resultado:
   - revisao de fronteiras DTO/mapper criticas e ampliacao de testes de borda.
 - Pendencias para fechamento: nenhuma.
 - Documentos oficiais desta fase:
+
+## Fase 4 - progresso consolidado (mar/2026)
+
+- Modelagem de negocio consolidada para assinatura e cobranca:
+  - `User -> Subscription -> Plan` (sem `plan_id` direto em `users`).
+  - `Payment` vinculado a `Subscription` (`subscription_id`).
+- Migracoes Flyway adicionadas:
+  - `src/main/resources/db/migration/V10__create_plan_tables_fix.sql`
+  - `src/main/resources/db/migration/V11__create_table_subscriptions.sql`
+  - `src/main/resources/db/migration/V12__create_table_payments.sql`
+- Modulo `plan` implementado em padrao UseCase + Port + Adapter:
+  - controller, DTOs, mapper, repository, ports e UseCases de CRUD/ativacao.
+- Modulo `subscription` implementado:
+  - entidade, repository, ports, adapter, mapper, controller e UseCases
+    `CreateSubscriptionUseCase`, `CancelSubscriptionUseCase`, `GetActiveSubscriptionByUserUseCase`.
+- Modulo `payment` implementado:
+  - entidade, repository, ports, adapter, mapper, controller e UseCases
+    `CreatePaymentUseCase`, `MarkPaymentAsPaidUseCase`, `ListPaymentsBySubscriptionUseCase`.
+- OCP aplicado em `plan` com `PlanPolicy` + politicas concretas + `PlanPolicyResolver`.
+
+Validacao executada nesta etapa:
+
+```powershell
+Set-Location "C:\Users\Guilherme\Desktop\Workspace\GymApp\backend"
+.\mvnw.cmd -q -DskipTests compile
+.\mvnw.cmd -q "-Dtest=backend.plan.usecase.*Test,backend.subscription.usecase.*Test,backend.payment.usecase.*Test" test
+```
+
+Resultado:
+- `compile`: OK.
+- suites `plan/subscription/payment`: OK.
   - `SOLID_PHASE_3_PLAN.md`
   - `SOLID_PHASE_3_SUMMARY.md`
 
@@ -269,3 +300,10 @@ Resultado:
   - auditoria estrutural dos UseCases sem pendencias;
   - teste de contexto concluido com sucesso apos subida do PostgreSQL local;
   - suites unitarias de `user`, `auth`, `dashboard`, `training` e `exercise` executadas com sucesso.
+## Fase 4 (OCP) � inicio Mar/2026
+### Slice 1 concluido
+- `SOLID_PHASE_4_PLAN.md`: documento de planejamento oficial criado.
+- `src/main/java/backend/user/model/entity/Plan.java`: entidade JPA implementada (id, name, description, price, maxStudents, maxPrograms, active, createdAt, updatedAt).
+- `src/main/resources/db/migration/V9__create_table_plan.sql`: migracao criada com seed (Free, Basic, Premium).
+Proximos passos (Slice 2):
+- `PlanRepository.java`, `PlanQueryPort.java`, `PlanCommandPort.java`, `PlanRepositoryAdapter.java`.
