@@ -59,7 +59,7 @@ public class Plan {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "plan_benefits", joinColumns = @JoinColumn(name = "plan_id"))
-    @Column(name = "benefits")
+    @Column(name = "benefits",  nullable = false)
     @Builder.Default
     private Set<String> benefits = new HashSet<>();
 
