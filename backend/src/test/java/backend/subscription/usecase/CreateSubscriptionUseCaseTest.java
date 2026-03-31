@@ -90,4 +90,31 @@ class CreateSubscriptionUseCaseTest {
 
         assertEquals("Usuario ja possui assinatura ativa", ex.getMessage());
     }
+
+    @Test
+    void executeShouldThrowWhenPlanIsInactive() {
+        CreateSubscriptionRequest request = CreateSubscriptionRequest.builder().planId(1L).userId(2L).build();
+        Plan plan = Plan.builder().id(1L).name("Free").active(false).price(new Money(new BigDecimal("0.00"))).build();
+
+        when(validationPort.existsActiveByUserId(2L)).thenReturn(false);
+        when(planQueryPort.findById(1L)).thenReturn(Optional.of(plan));
+
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> useCase.execute(request));
+
+        assertEquals("Plano inativo nao pode receber novas assinaturas", ex.getMessage());
+    }
+
+    @Test
+    void executeShouldThrowWhenUserNotFound() {
+        CreateSubscriptionRequest request = CreateSubscriptionRequest.builder().planId(1L).userId(2L).build();
+        Plan plan = Plan.builder().id(1L).name("Free").active(true).price(new Money(new BigDecimal("0.00"))).build();
+
+        when(validationPort.existsActiveByUserId(2L)).thenReturn(false);
+        when(planQueryPort.findById(1L)).thenReturn(Optional.of(plan));
+        when(userQueryPort.findById(2L)).thenReturn(Optional.empty());
+
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> useCase.execute(request));
+
+        assertEquals("Usuario nao encontrado", ex.getMessage());
+    }
 }

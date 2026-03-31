@@ -53,4 +53,14 @@ class CancelSubscriptionUseCaseTest {
 
         assertEquals("Assinatura ja esta cancelada", ex.getMessage());
     }
+
+    @Test
+    void executeShouldThrowWhenStatusIsExpired() {
+        Subscription subscription = Subscription.builder().id(1L).status(SubscriptionStatus.EXPIRED).build();
+        when(queryPort.findById(1L)).thenReturn(Optional.of(subscription));
+
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> useCase.execute(1L));
+
+        assertEquals("Transicao invalida: assinatura EXPIRED nao pode ser cancelada", ex.getMessage());
+    }
 }

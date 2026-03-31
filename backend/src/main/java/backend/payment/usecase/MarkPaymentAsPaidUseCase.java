@@ -27,14 +27,21 @@ public class MarkPaymentAsPaidUseCase {
         Payment payment = queryPort.findById(paymentId)
                 .orElseThrow(() -> new BadRequestException("Pagamento nao encontrado"));
 
+        PaymentStatus previousStatus = payment.getStatus();
+
         if (PaymentStatus.PAID.equals(payment.getStatus())) {
             throw new BadRequestException("Pagamento ja esta marcado como pago");
+        }
+
+        if (!PaymentStatus.PENDING.equals(payment.getStatus())) {
+            throw new BadRequestException("Transicao invalida: somente pagamento PENDING pode virar PAID");
         }
 
         payment.setStatus(PaymentStatus.PAID);
         payment.setPaymentDate(LocalDate.now());
 
         commandPort.update(payment);
+        log.info("Pagamento {} atualizado de {} para {}", paymentId, previousStatus, payment.getStatus());
     }
 
 }

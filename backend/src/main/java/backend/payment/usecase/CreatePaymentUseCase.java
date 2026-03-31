@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -28,6 +30,8 @@ public class CreatePaymentUseCase {
     public PaymentResponse execute(CreatePaymentRequest request) {
         log.info("Criando pagamento para subscriptionId={}", request.getSubscriptionId());
 
+        validateRequiredFields(request);
+
         Subscription subscription = subscriptionQueryPort.findById(request.getSubscriptionId())
                 .orElseThrow(() -> new BadRequestException("Assinatura nao encontrada"));
 
@@ -35,15 +39,41 @@ public class CreatePaymentUseCase {
             throw new BadRequestException("Nao e permitido gerar pagamento para assinatura inativa");
         }
 
+        PaymentStatus initialStatus = request.getStatus() != null ? request.getStatus() : PaymentStatus.PENDING;
+        if (!PaymentStatus.PENDING.equals(initialStatus)) {
+            throw new BadRequestException("Transicao invalida: pagamento deve ser criado com status PENDING");
+        }
+
         Payment saved = commandPort.save(Payment.builder()
                 .subscription(subscription)
-                .status(request.getStatus() != null ? request.getStatus() : PaymentStatus.PENDING)
+                .status(initialStatus)
                 .amount(request.getAmount())
                 .dueDate(request.getDueDate())
                 .paymentMethod(request.getPaymentMethod())
                 .build());
 
+        log.info("Pagamento {} criado com status {} para assinatura {}", saved.getId(), saved.getStatus(), request.getSubscriptionId());
+
         return mapper.toResponse(saved);
+    }
+
+    private void validateRequiredFields(CreatePaymentRequest request) {
+        if (request.getSubscriptionId() == null) {
+            throw new BadRequestException("subscriptionId e obrigatorio");
+        }
+
+        BigDecimal amount = request.getAmount();
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BadRequestException("amount deve ser maior que zero");
+        }
+
+        if (request.getDueDate() == null) {
+            throw new BadRequestException("dueDate e obrigatorio");
+        }
+
+        if (request.getPaymentMethod() == null) {
+            throw new BadRequestException("paymentMethod e obrigatorio");
+        }
     }
 
 }

@@ -36,8 +36,30 @@ Resultado:
 
 ## Risco residual controlado
 
-- Regras de autorizacao por ownership (dono da assinatura/pagamento) podem ser refinadas em um hardening posterior.
 - Regras avancadas de cobranca (grace period, retry policy, estorno com gateway externo) ficam para extensoes da fase seguinte.
+- Historico de eventos de dominio (outbox/auditoria persistida) ainda nao foi introduzido; hoje a observabilidade esta em logs.
+
+## Incremento de hardening (2026-03-31)
+
+- Leitura de assinatura ativa por usuario endurecida com validacao de `self` ou perfil privilegiado.
+- Listagem de pagamentos por assinatura endurecida com validacao de ownership ou perfil privilegiado.
+- `SubscriptionController` e `PaymentController` passam `Authentication` para os UseCases de leitura.
+- Cobertura de testes ampliada para cenarios: owner permitido, perfil privilegiado permitido e acesso negado.
+
+## Incremento de testes negativos (Slice B - 2026-03-31)
+
+- `CreateSubscriptionUseCaseTest`: cobertura de plano inativo, usuario inexistente e assinatura ativa duplicada.
+- `CreatePaymentUseCaseTest`: cobertura de assinatura expirada e campos obrigatorios (`subscriptionId`, `amount`, `dueDate`, `paymentMethod`).
+- `MarkPaymentAsPaidUseCaseTest`: cobertura de pagamento inexistente e transicao invalida de status.
+- `CreatePaymentUseCase`: validacoes de campos obrigatorios movidas para regra de dominio do UseCase (alem de validacao HTTP).
+- `MarkPaymentAsPaidUseCase`: transicao endurecida para permitir apenas `PENDING -> PAID`.
+
+## Incremento de observabilidade e consistencia (Slice C - 2026-03-31)
+
+- `CancelSubscriptionUseCase`: evento de log para transicao de status e bloqueio de `EXPIRED -> CANCELLED`.
+- `CreatePaymentUseCase`: criacao endurecida para status inicial apenas `PENDING` e log de evento de criacao.
+- `MarkPaymentAsPaidUseCase`: log de transicao de status apos update persistido.
+- Cobertura adicional de testes para transicoes invalidas: assinatura `EXPIRED` no cancelamento e status inicial de pagamento diferente de `PENDING`.
 
 ## Conclusao
 
@@ -45,5 +67,5 @@ A implementacao base da Fase 4 foi concluida com padrao arquitetural consistente
 
 ## Continuidade
 
-- Proxima execucao guiada em `SOLID_PHASE_4_CONTINUITY.md`.
+- Fase 4 segue com melhoria continua guiada em `SOLID_PHASE_4_CONTINUITY.md`.
 

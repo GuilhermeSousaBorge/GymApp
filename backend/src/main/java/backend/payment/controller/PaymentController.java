@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,9 +44,10 @@ public class PaymentController {
     }
 
     @GetMapping("/subscriptions/{subscriptionId}")
-    public ResponseEntity<List<PaymentResponse>> listBySubscription(@PathVariable Long subscriptionId) {
+    public ResponseEntity<List<PaymentResponse>> listBySubscription(@PathVariable Long subscriptionId,
+                                                                    Authentication authentication) {
         log.info("GET /api/payments/subscriptions/{}", subscriptionId);
-        return ResponseEntity.ok(listPaymentsBySubscriptionUseCase.execute(subscriptionId));
+        return ResponseEntity.ok(listPaymentsBySubscriptionUseCase.execute(subscriptionId, authentication));
     }
 }
 

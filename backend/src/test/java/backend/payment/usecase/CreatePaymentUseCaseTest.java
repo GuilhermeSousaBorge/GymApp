@@ -25,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -79,5 +81,82 @@ class CreatePaymentUseCaseTest {
         BadRequestException ex = assertThrows(BadRequestException.class, () -> useCase.execute(request));
 
         assertEquals("Nao e permitido gerar pagamento para assinatura inativa", ex.getMessage());
+    }
+
+    @Test
+    void executeShouldThrowWhenSubscriptionIsExpired() {
+        CreatePaymentRequest request = CreatePaymentRequest.builder()
+                .subscriptionId(1L)
+                .amount(new BigDecimal("99.90"))
+                .dueDate(LocalDate.now().plusDays(7))
+                .paymentMethod(PaymentMethod.PIX)
+                .build();
+
+        Subscription subscription = Subscription.builder().id(1L).status(SubscriptionStatus.EXPIRED).build();
+        when(subscriptionQueryPort.findById(1L)).thenReturn(Optional.of(subscription));
+
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> useCase.execute(request));
+
+        assertEquals("Nao e permitido gerar pagamento para assinatura inativa", ex.getMessage());
+    }
+
+    @Test
+    void executeShouldThrowWhenAmountIsMissing() {
+        CreatePaymentRequest request = CreatePaymentRequest.builder()
+                .subscriptionId(1L)
+                .dueDate(LocalDate.now().plusDays(7))
+                .paymentMethod(PaymentMethod.PIX)
+                .build();
+
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> useCase.execute(request));
+
+        assertEquals("amount deve ser maior que zero", ex.getMessage());
+        verify(subscriptionQueryPort, never()).findById(any());
+    }
+
+    @Test
+    void executeShouldThrowWhenDueDateIsMissing() {
+        CreatePaymentRequest request = CreatePaymentRequest.builder()
+                .subscriptionId(1L)
+                .amount(new BigDecimal("10.00"))
+                .paymentMethod(PaymentMethod.PIX)
+                .build();
+
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> useCase.execute(request));
+
+        assertEquals("dueDate e obrigatorio", ex.getMessage());
+        verify(subscriptionQueryPort, never()).findById(any());
+    }
+
+    @Test
+    void executeShouldThrowWhenPaymentMethodIsMissing() {
+        CreatePaymentRequest request = CreatePaymentRequest.builder()
+                .subscriptionId(1L)
+                .amount(new BigDecimal("10.00"))
+                .dueDate(LocalDate.now().plusDays(7))
+                .build();
+
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> useCase.execute(request));
+
+        assertEquals("paymentMethod e obrigatorio", ex.getMessage());
+        verify(subscriptionQueryPort, never()).findById(any());
+    }
+
+    @Test
+    void executeShouldThrowWhenInitialStatusIsNotPending() {
+        CreatePaymentRequest request = CreatePaymentRequest.builder()
+                .subscriptionId(1L)
+                .amount(new BigDecimal("99.90"))
+                .dueDate(LocalDate.now().plusDays(7))
+                .paymentMethod(PaymentMethod.PIX)
+                .status(PaymentStatus.PAID)
+                .build();
+
+        Subscription subscription = Subscription.builder().id(1L).status(SubscriptionStatus.ACTIVE).build();
+        when(subscriptionQueryPort.findById(1L)).thenReturn(Optional.of(subscription));
+
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> useCase.execute(request));
+
+        assertEquals("Transicao invalida: pagamento deve ser criado com status PENDING", ex.getMessage());
     }
 }

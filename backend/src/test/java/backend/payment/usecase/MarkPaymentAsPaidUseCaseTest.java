@@ -52,4 +52,23 @@ class MarkPaymentAsPaidUseCaseTest {
 
         assertEquals("Pagamento ja esta marcado como pago", ex.getMessage());
     }
+
+    @Test
+    void executeShouldThrowWhenPaymentNotFound() {
+        when(queryPort.findById(99L)).thenReturn(Optional.empty());
+
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> useCase.execute(99L));
+
+        assertEquals("Pagamento nao encontrado", ex.getMessage());
+    }
+
+    @Test
+    void executeShouldThrowWhenStatusTransitionIsInvalid() {
+        Payment payment = Payment.builder().id(1L).status(PaymentStatus.CANCELLED).build();
+        when(queryPort.findById(1L)).thenReturn(Optional.of(payment));
+
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> useCase.execute(1L));
+
+        assertEquals("Transicao invalida: somente pagamento PENDING pode virar PAID", ex.getMessage());
+    }
 }

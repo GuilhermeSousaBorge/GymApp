@@ -258,6 +258,8 @@ Resultado:
   - revisao de fronteiras DTO/mapper criticas e ampliacao de testes de borda.
 - Pendencias para fechamento: nenhuma.
 - Documentos oficiais desta fase:
+  - `SOLID_PHASE_3_PLAN.md`
+  - `SOLID_PHASE_3_SUMMARY.md`
 
 ## Fase 4 - progresso consolidado (mar/2026)
 
@@ -289,21 +291,34 @@ Set-Location "C:\Users\Guilherme\Desktop\Workspace\GymApp\backend"
 Resultado:
 - `compile`: OK.
 - suites `plan/subscription/payment`: OK.
-  - `SOLID_PHASE_3_PLAN.md`
-  - `SOLID_PHASE_3_SUMMARY.md`
+
+- Hardening Fase 4 (Slice A) concluido:
+  - ownership/authorization em leituras de `subscription` e `payment` via `Authentication` no UseCase;
+  - acesso negado padronizado com `AccessDeniedException` (HTTP 403).
+- Testes negativos Fase 4 (Slice B) concluidos:
+  - `CreateSubscriptionUseCaseTest` com plano inativo/usuario inexistente/assinatura ativa duplicada;
+  - `CreatePaymentUseCaseTest` com assinatura expirada e dados obrigatorios incompletos;
+  - `MarkPaymentAsPaidUseCaseTest` com pagamento inexistente e transicao invalida.
+- Regras de dominio endurecidas:
+  - `CreatePaymentUseCase` valida `subscriptionId`, `amount`, `dueDate`, `paymentMethod`;
+  - `MarkPaymentAsPaidUseCase` permite apenas transicao `PENDING -> PAID`.
+- Observabilidade e consistencia de status Fase 4 (Slice C) concluidas:
+  - logs de transicao adicionados em `CancelSubscriptionUseCase` e `MarkPaymentAsPaidUseCase`;
+  - log de evento de criacao adicionado em `CreatePaymentUseCase`;
+  - cancelamento de assinatura endurecido com bloqueio de `EXPIRED -> CANCELLED`;
+  - criacao de pagamento endurecida para status inicial apenas `PENDING`.
+
+- Documentos oficiais da Fase 4:
+  - `SOLID_PHASE_4_PLAN.md`
+  - `SOLID_PHASE_4_CONTINUITY.md`
+  - `SOLID_PHASE_4_SUMMARY.md`
 
 ## Ultima atualizacao
 
-- Data: 2026-03-29
+- Data: 2026-03-31
 - Evidencia tecnica recente:
   - compilacao local concluida sem erros;
-  - auditoria estrutural dos UseCases sem pendencias;
-  - teste de contexto concluido com sucesso apos subida do PostgreSQL local;
-  - suites unitarias de `user`, `auth`, `dashboard`, `training` e `exercise` executadas com sucesso.
-## Fase 4 (OCP) � inicio Mar/2026
-### Slice 1 concluido
-- `SOLID_PHASE_4_PLAN.md`: documento de planejamento oficial criado.
-- `src/main/java/backend/user/model/entity/Plan.java`: entidade JPA implementada (id, name, description, price, maxStudents, maxPrograms, active, createdAt, updatedAt).
-- `src/main/resources/db/migration/V9__create_table_plan.sql`: migracao criada com seed (Free, Basic, Premium).
-Proximos passos (Slice 2):
-- `PlanRepository.java`, `PlanQueryPort.java`, `PlanCommandPort.java`, `PlanRepositoryAdapter.java`.
+  - suites de `plan/subscription/payment` executadas com sucesso;
+  - hardening de ownership/autorizacao (Slice A) aplicado e validado;
+  - testes negativos adicionais (Slice B) aplicados e validados;
+  - observabilidade e consistencia de status (Slice C) aplicadas e validadas.

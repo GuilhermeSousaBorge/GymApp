@@ -31,6 +31,12 @@ public class CancelSubscriptionUseCase {
             throw new BadRequestException("Assinatura ja esta cancelada");
         }
 
+        if (SubscriptionStatus.EXPIRED.equals(subscription.getStatus())) {
+            throw new BadRequestException("Transicao invalida: assinatura EXPIRED nao pode ser cancelada");
+        }
+
+        SubscriptionStatus previousStatus = subscription.getStatus();
+
         subscription.setStatus(SubscriptionStatus.CANCELLED);
         subscription.setCancelledAt(LocalDateTime.now());
         subscription.setAutoRenew(false);
@@ -39,6 +45,7 @@ public class CancelSubscriptionUseCase {
         }
 
         commandPort.update(subscription);
+        log.info("Assinatura {} atualizada de {} para {}", subscriptionId, previousStatus, subscription.getStatus());
     }
 }
 

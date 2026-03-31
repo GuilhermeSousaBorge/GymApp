@@ -43,9 +43,10 @@ public class SubscriptionController {
     }
 
     @GetMapping("/users/{userId}/active")
-    public ResponseEntity<SubscriptionResponse> getActiveByUser(@PathVariable Long userId) {
+    public ResponseEntity<SubscriptionResponse> getActiveByUser(@PathVariable Long userId,
+                                                                Authentication authentication) {
         log.info("GET /api/subscriptions/users/{}/active", userId);
-        return ResponseEntity.ok(getActiveSubscriptionByUserUseCase.execute(userId));
+        return ResponseEntity.ok(getActiveSubscriptionByUserUseCase.execute(userId, authentication));
     }
 
     @GetMapping("/me/active")
@@ -55,7 +56,7 @@ public class SubscriptionController {
             throw new UnauthorizedException("Usuario nao autenticado");
         }
         log.info("GET /api/subscriptions/me/active - userId={}", userId);
-        return ResponseEntity.ok(getActiveSubscriptionByUserUseCase.execute(userId));
+        return ResponseEntity.ok(getActiveSubscriptionByUserUseCase.execute(userId, authentication));
     }
 }
 

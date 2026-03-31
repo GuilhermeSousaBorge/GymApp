@@ -1,7 +1,7 @@
 # Documentacao - Indice Atual (Mar/2026)
 
 Projeto: `backend` (GymApp)  
-Status SOLID: Fase 1 concluida, Fase 2 concluida no fluxo HTTP, Fase 3 concluida, Fase 4 em execucao (base concluida, continuidade em hardening)
+Status SOLID: Fase 1 concluida, Fase 2 concluida no fluxo HTTP, Fase 3 concluida, Fase 4 em execucao (base + Slice A/B/C concluidos em 2026-03-31)
 
 ## Leia primeiro
 
@@ -26,6 +26,15 @@ Status SOLID: Fase 1 concluida, Fase 2 concluida no fluxo HTTP, Fase 3 concluida
 6. `SOLID_PHASE_4_CONTINUITY.md`
 - Guia de continuidade da Fase 4 (slices, checklist de PR, validacao)
 
+7. `GUIA_ARQUITETURA_PROJETO.md`
+- Guia detalhado da estrutura, arquitetura e decisoes tecnicas para estudo e replicacao
+
+8. `GUIA_ARQUITETURA_PROJETO_V2.md`
+- Versao com diagramas textuais, template SOLID copiavel e checklist de PR arquitetural
+
+9. `FRONTEND_HANDOFF_2026-03-31.md`
+- Handoff operacional para o frontend com contratos reais, roles, ownership, status e formato de erro
+
 ## Fonte de verdade (manter atualizada)
 
 - `AGENTS.md`
@@ -35,6 +44,9 @@ Status SOLID: Fase 1 concluida, Fase 2 concluida no fluxo HTTP, Fase 3 concluida
 - `SOLID_PHASE_4_PLAN.md`
 - `SOLID_PHASE_4_CONTINUITY.md`
 - `SOLID_PHASE_4_SUMMARY.md`
+- `GUIA_ARQUITETURA_PROJETO.md`
+- `GUIA_ARQUITETURA_PROJETO_V2.md`
+- `FRONTEND_HANDOFF_2026-03-31.md`
 - `DOCUMENTATION_INDEX.md`
 
 ## Documentos historicos (nao usar como referencia principal)
@@ -69,13 +81,23 @@ Obs: esses arquivos preservam contexto de sessoes anteriores e da execucao da fa
 - UseCases dos modulos principais nao importam mais `*.repository.*` diretamente.
 - Dependencias cross-modulo entre `training`, `exercise` e `user` estao intermediadas por portas.
 - Testes de UseCase de `auth`, `dashboard` e leituras residuais de `training` foram ajustados para mockar portas.
+- Fase 4 base concluida com modulos `plan`, `subscription` e `payment`.
+- Slice A de hardening concluido: ownership/autorizacao nas leituras de assinatura e pagamento.
+- Slice B de testes negativos concluido para `CreateSubscriptionUseCase`, `CreatePaymentUseCase` e `MarkPaymentAsPaidUseCase`.
+- Regras de dominio endurecidas em pagamento:
+  - `CreatePaymentUseCase` valida `subscriptionId`, `amount`, `dueDate`, `paymentMethod`.
+  - `MarkPaymentAsPaidUseCase` permite apenas `PENDING -> PAID`.
+- Slice C concluido com observabilidade e consistencia de transicoes:
+  - logs de evento de status padronizados nos fluxos de escrita de `subscription` e `payment`;
+  - bloqueio de `EXPIRED -> CANCELLED` em assinatura;
+  - criacao de pagamento apenas com status inicial `PENDING`.
 
 ## Comandos de validacao rapida (PowerShell)
 
 ```powershell
 Set-Location "C:\Users\Guilherme\Desktop\Workspace\GymApp\backend"
 .\mvnw.cmd -q clean -DskipTests compile
-.\mvnw.cmd -q "-Dtest=backend.user.usecase.*Test,backend.auth.usecase.*Test,backend.dashboard.usecase.*Test,backend.training.usecase.*Test,backend.exercise.usecase.*Test" test
+.\mvnw.cmd -q "-Dtest=backend.user.usecase.*Test,backend.auth.usecase.*Test,backend.dashboard.usecase.*Test,backend.training.usecase.*Test,backend.exercise.usecase.*Test,backend.plan.usecase.*Test,backend.subscription.usecase.*Test,backend.payment.usecase.*Test" test
 ```
 
 ## Proximo bloco de trabalho recomendado
@@ -85,4 +107,4 @@ Set-Location "C:\Users\Guilherme\Desktop\Workspace\GymApp\backend"
   - `subscription`: `Create`, `Cancel`, `GetActiveByUser`.
   - `payment`: `Create`, `MarkAsPaid`, `ListBySubscription`.
   - migracoes novas: `V10`, `V11`, `V12`.
-- Proximo foco: seguir `SOLID_PHASE_4_CONTINUITY.md` para hardening de regras, cobertura negativa e consistencia de fronteiras.
+- Proximo foco: evoluir regras avancadas de cobranca (grace period, retry policy e estorno) sem quebrar contratos atuais, conforme `SOLID_PHASE_4_CONTINUITY.md`.
