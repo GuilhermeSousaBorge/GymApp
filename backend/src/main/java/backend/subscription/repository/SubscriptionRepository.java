@@ -14,5 +14,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
     boolean existsByUserIdAndStatus(Long userId, SubscriptionStatus status);
 
     List<Subscription> findByUserIdOrderByStartDateDesc(Long userId);
+
+    long countByStatus(SubscriptionStatus status);
 }
 

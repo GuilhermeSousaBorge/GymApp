@@ -3,6 +3,7 @@ package backend.user.repository;
 import backend.user.model.entity.User;
 import backend.user.model.valueObjects.Cpf;
 import backend.user.model.valueObjects.Email;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -41,5 +42,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.role.name = :role")
     List<User> findByRole(@Param("role") String roleName);
+
+    @Query("SELECT u FROM User u WHERE u.role.name = 'Aluno' AND u.active = true ORDER BY u.createdAt DESC")
+    List<User> findLatestStudents(Pageable pageable);
 
 }

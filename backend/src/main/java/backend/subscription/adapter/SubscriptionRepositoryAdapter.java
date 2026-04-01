@@ -56,5 +56,11 @@ public class SubscriptionRepositoryAdapter
         log.debug("SubscriptionRepositoryAdapter: existsActiveByUserId({})", userId);
         return repository.existsByUserIdAndStatus(userId, SubscriptionStatus.ACTIVE);
     }
+
+    @Override
+    public long countByStatus(SubscriptionStatus status) {
+        log.debug("SubscriptionRepositoryAdapter: countByStatus({})", status);
+        return repository.countByStatus(status);
+    }
 }
 

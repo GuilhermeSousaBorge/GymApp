@@ -9,6 +9,7 @@ import backend.user.port.UserValidationPort;
 import backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -72,6 +73,12 @@ public class UserRepositoryAdapter implements UserQueryPort, UserCommandPort, Us
     public int countCreatedBetween(LocalDateTime startDate, LocalDateTime endDate) {
         log.debug("UserRepositoryAdapter: countCreatedBetween({}, {})", startDate, endDate);
         return userRepository.countByCreatedAtBetween(startDate, endDate);
+    }
+
+    @Override
+    public List<User> findLatestStudents(int limit) {
+        log.debug("UserRepositoryAdapter: findLatestStudents({})", limit);
+        return userRepository.findLatestStudents(PageRequest.of(0, limit));
     }
     
     // ========== UserCommandPort Implementation ==========

@@ -60,5 +60,12 @@ public interface UserQueryPort {
      * @return Quantidade de usuários
      */
     int countCreatedBetween(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate);
+
+    /**
+     * Busca os últimos alunos cadastrados
+     * @param limit Quantidade máxima de resultados
+     * @return Lista dos últimos alunos
+     */
+    List<User> findLatestStudents(int limit);
 }
 
