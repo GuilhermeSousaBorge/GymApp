@@ -1,8 +1,12 @@
 export type Plan = {
     id: number
     name: string
-    price: number // money vira number no front
-    durationMonths: number
-    benefits: string
+    description: string
+    price: number
+    maxStudents: number
+    maxPrograms: number
+    benefits: string[]
     active: boolean
-  }
+    createdAt: string
+    updatedAt: string
+}

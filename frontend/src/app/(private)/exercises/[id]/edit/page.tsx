@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
+import { ErrorState } from "@/components/ui/error-state"
+import { LoadingState } from "@/components/ui/loading-state"
 import { useCreateExercise, useExerciseDetails, useUpdateExercise } from "@/hooks/exercise"
 import { useExerciseCategories } from "@/hooks/exerciseCategory"
 import { handleMessageError } from "@/lib/handle-error"
@@ -61,9 +63,8 @@ const ExerciseEditPage = () => {
         }
     }
 
-    if (isLoading || isLoadingCategory) return <>Carregando dados</>
-    if (isEditing && error) return <>Erro ao carregar dados</>
-
+    if (isLoading || isLoadingCategory) return <LoadingState message="Carregando exercício..." />
+    if (isEditing && error) return <ErrorState message="Erro ao carregar exercício" />
     return (
         <div className="flex flex-col gap-6">
 

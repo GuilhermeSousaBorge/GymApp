@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
+import { ErrorState } from "@/components/ui/error-state"
+import { LoadingState } from "@/components/ui/loading-state"
 import { useCreateProgram, useProgramDetails, useUpdateProgram } from "@/hooks/training-program"
 import { useUsers } from "@/hooks/user"
 import { handleMessageError } from "@/lib/handle-error"
@@ -59,8 +61,8 @@ const EditTrainingProgramPage = () => {
         }
     }
 
-    if (isLoading) return <>Carregando....</>
-    if (isEditing && error) return <>Algo deu errado</>
+    if (isLoading) return <LoadingState message="Carregando programa..." />
+    if (isEditing && error) return <ErrorState message="Erro ao carregar programa" />
 
     return (
         <div className="flex flex-col gap-6">

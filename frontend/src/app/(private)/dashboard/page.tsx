@@ -1,7 +1,7 @@
 "use client";
 
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
-import { StudentDashboard } from "@/components/dashboard/student-daschboard";
+import { StudentDashboard } from "@/components/dashboard/student-dashboard";
 import { useUser } from "@/stores/auth";
 
 export default function DashboardPage() {

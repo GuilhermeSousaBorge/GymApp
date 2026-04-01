@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ErrorState } from "@/components/ui/error-state"
+import { LoadingState } from "@/components/ui/loading-state"
 import { usePrograms } from "@/hooks/training-program"
 import { useUsers } from "@/hooks/user"
 import { formatDate, isAdmin } from "@/lib/utils"
@@ -30,8 +32,8 @@ const TrainingProgramPage = () => {
     return matchesSearch && matchesUser
   })
 
-  if (isLoadingPrograms || isLoadingUsers) return <>Carregando ...</>
-  if (programError || userError) return <>Deu erro ai...</>
+  if (isLoadingPrograms || isLoadingUsers) return <LoadingState message="Carregando programas..." />
+  if (programError || userError) return <ErrorState message="Erro ao carregar programas" />
 
   return (
     <div className="flex flex-col gap-6">

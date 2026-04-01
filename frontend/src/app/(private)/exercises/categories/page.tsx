@@ -8,6 +8,8 @@ import { Field, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ErrorState } from "@/components/ui/error-state"
+import { LoadingState } from "@/components/ui/loading-state"
 import { useCreateCategory, useExerciseCategories, useUpdateCategory } from "@/hooks/exerciseCategory"
 import { handleMessageError } from "@/lib/handle-error"
 import { isAdmin } from "@/lib/utils"
@@ -71,9 +73,8 @@ const ExerciseCategoryPage = () => {
         }
     }
 
-    if (isLoading) return <>Carregando Dados</>
-    if (error) return <>Erro ao carregar dados</>
-
+    if (isLoading) return <LoadingState message="Carregando categorias..." />
+    if (error) return <ErrorState message="Erro ao carregar categorias" />
     return (
         <div className="flex flex-col gap-6">
 

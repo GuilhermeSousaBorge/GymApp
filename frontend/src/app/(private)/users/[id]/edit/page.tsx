@@ -6,6 +6,8 @@ import { UserAddress } from "@/components/user/user-address"
 import { UserPersonal } from "@/components/user/user-personal"
 import { UserRole } from "@/components/user/user-role"
 import { UserSystem } from "@/components/user/user-system"
+import { ErrorState } from "@/components/ui/error-state"
+import { LoadingState } from "@/components/ui/loading-state"
 import { useCreateUser, useUpdateUser, useUserDetails } from "@/hooks/user"
 import { handleMessageError } from "@/lib/handle-error"
 import { UserFormData, userFormSchema } from "@/lib/validations/user"
@@ -51,9 +53,9 @@ const EditUser = () => {
         })
     }, [methods, user])
 
-    if (isEditing && isLoading) return <>Carregando detalhes do usuário</>
-    if (isEditing && error) return <>Erro ao carregar dados</>
-    if (isEditing && !user) return <>Usuário não encontrado</>
+    if (isEditing && isLoading) return <LoadingState message="Carregando detalhes do usuário..." />
+    if (isEditing && error) return <ErrorState message="Erro ao carregar dados do usuário" />
+    if (isEditing && !user) return <ErrorState message="Usuário não encontrado" />
 
     const onSubmit = async (data: UserFormData) => {
         try {

@@ -3,9 +3,11 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { ErrorState } from "@/components/ui/error-state"
 import { Field, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { LoadingState } from "@/components/ui/loading-state"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useExercises } from "@/hooks/exercise"
 import { useCreateTrainingExericse, useTrainingExerciseDetails, useUpdateTrainingExercise } from "@/hooks/training-exercise"
@@ -52,14 +54,13 @@ const EditTrainingExercisePage = () => {
     })
 
     const onSubmit = async (data: TrainingExerciseFormData) => {
-        console.log(data)
         try {
             if (isEditing) {
                 await updateTrainingExercise({ id: Number(params.trainingExerciseId), exercise: data })
-                toast.success("Exercisio atualizado com sucesso", { position: "top-right" })
+                toast.success("Exercício atualizado com sucesso", { position: "top-right" })
             } else {
                 await createTrainingexercise(data)
-                toast.success("Exercisio atualizado com sucesso", { position: "top-right" })
+                toast.success("Exercício criado com sucesso", { position: "top-right" })
             }
         } catch (err) {
             const message = handleMessageError(err)
@@ -67,10 +68,9 @@ const EditTrainingExercisePage = () => {
         }
     }
 
-    if (isExerciseLoading || isExercisesLoading) return <>Carregando...</>
+    if (isExerciseLoading || isExercisesLoading) return <LoadingState />
 
-    if (exerciseError || exercisesError) return <>Algo deu errado</>
-
+    if (exerciseError || exercisesError) return <ErrorState />
     return (
         <div>
             <Card>
@@ -164,7 +164,7 @@ const EditTrainingExercisePage = () => {
                                 type="button"
                                 variant="outline"
                                 className="bg-red-500"
-                                onClick={() => router.push("/training-exercises")}
+                                onClick={() => router.push(`/training-exercises/${params.sheetId}`)}
                             >
                                 Cancelar
                             </Button>

@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
+import { ErrorState } from "@/components/ui/error-state"
+import { LoadingState } from "@/components/ui/loading-state"
 import { useCreateSheet, useSheetDetails, useUpdateSheet } from "@/hooks/training-sheet"
 import { handleMessageError } from "@/lib/handle-error"
 import { TrainingSheetFormData, trainingSheetSchema } from "@/lib/validations/training-sheet"
@@ -55,8 +57,8 @@ const EditTrainingSheetPage = () => {
         }
     }
 
-    if (isLoading) return <>Carregando...</>
-    if (isEditing && error) return <>Deu erro ai...</>
+    if (isLoading) return <LoadingState message="Carregando ficha..." />
+    if (isEditing && error) return <ErrorState message="Erro ao carregar ficha" />
 
     return (
         <div className="flex flex-col gap-6">

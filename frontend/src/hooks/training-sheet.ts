@@ -29,7 +29,7 @@ export const useCreateSheet = () => {
         mutationFn: (sheet: TrainingSheetFormData) => trainingSheetService.create(sheet),
         onSuccess: (createdSheet) => {
             queryClient.invalidateQueries({ queryKey: ["training-sheets"] })
-            router.push(`/training-sheet/${createdSheet.id}/edit`)
+            router.push(`/training-sheets/${createdSheet.trainingProgramId}/${createdSheet.id}/edit`)
         }
     })
 }

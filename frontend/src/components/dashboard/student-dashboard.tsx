@@ -3,6 +3,8 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ErrorState } from "@/components/ui/error-state"
+import { LoadingState } from "@/components/ui/loading-state"
 import { useStudentDashboard } from "@/hooks/dashboard"
 import { useUser } from "@/stores/auth"
 import { WEEKDAYS } from "@/types/training"
@@ -13,8 +15,8 @@ export const StudentDashboard = () => {
     const user = useUser()
     const { data, isLoading, error } = useStudentDashboard()
 
-    if (isLoading) return <>Carregando dashboard...</>
-    if (error) return <>Erro ao carregar dashboard</>
+    if (isLoading) return <LoadingState message="Carregando dashboard..." />
+    if (error) return <ErrorState message="Erro ao carregar dashboard" />
 
     return (
         <div className="flex flex-col gap-6">

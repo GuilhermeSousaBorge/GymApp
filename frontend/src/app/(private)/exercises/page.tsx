@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ErrorState } from "@/components/ui/error-state"
+import { LoadingState } from "@/components/ui/loading-state"
 import { useExercises } from "@/hooks/exercise"
 import { useExerciseCategories } from "@/hooks/exerciseCategory"
 import { Exercise } from "@/types/exercise"
@@ -28,9 +30,8 @@ const ExercisePage = () => {
         return matchesSearch && matchesCategory && matchesStatus
     })
 
-    if (isLoading) return <>Carregando dados</>
-    if (error) return <>Erro ao carregar dados</>
-
+    if (isLoading) return <LoadingState message="Carregando exercícios..." />
+    if (error) return <ErrorState message="Erro ao carregar exercícios" />
     return (
         <div className="flex flex-col gap-6">
 

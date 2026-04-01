@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ErrorState } from "@/components/ui/error-state"
+import { LoadingState } from "@/components/ui/loading-state"
 import { useSheets } from "@/hooks/training-sheet"
 import { translateWeekDays } from "@/lib/utils"
 import { CalendarDays, Plus } from "lucide-react"
@@ -14,8 +16,8 @@ const SheetsPage = () => {
     const params = useParams()
     const { data: sheets = [], isLoading, error } = useSheets({ programId: Number(params.programId) })
 
-    if (isLoading) return <>Carregando...</>
-    if (error) return <>Deu erro ai...</>
+    if (isLoading) return <LoadingState message="Carregando fichas..." />
+    if (error) return <ErrorState message="Erro ao carregar fichas" />
 
     return (
         <div className="flex flex-col gap-6">

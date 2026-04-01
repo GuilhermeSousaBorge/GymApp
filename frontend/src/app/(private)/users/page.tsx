@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ErrorState } from "@/components/ui/error-state"
+import { LoadingState } from "@/components/ui/loading-state"
 import { useUsers } from "@/hooks/user"
 import { isAdmin } from "@/lib/utils"
 import { useUser } from "@/stores/auth"
@@ -32,9 +34,8 @@ const ListUsers = () => {
         return matchesSearch && matchesRole && matchesStatus
     })
 
-    if (isLoading) return <>Carregando lista de usuários</>
-    if (error) return <>Erro ao carregar dados</>
-
+    if (isLoading) return <LoadingState message="Carregando usuários..." />
+    if (error) return <ErrorState message="Erro ao carregar usuários" />
     return (
         <div className="flex flex-col gap-6">
 

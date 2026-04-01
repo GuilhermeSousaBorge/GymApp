@@ -113,6 +113,10 @@ public class User {
         return this.address;
     }
 
+    public Boolean getActive(){
+        return this.active;
+    }
+
     public Role getRole() {
         return this.role;
     }

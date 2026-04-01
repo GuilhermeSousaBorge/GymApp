@@ -16,6 +16,7 @@ import {
   Bolt,
   ClipboardList,
   CreditCard,
+  DollarSign,
   Dumbbell,
   LayoutDashboard,
   LogOut,
@@ -35,6 +36,7 @@ const iconMap: Record<string, LucideIcon> = {
   dashboard: LayoutDashboard,
   trainings: Dumbbell,
   exercises: ClipboardList,
+  financial: DollarSign,
   payments: CreditCard,
   users: Users,
   config: Bolt
@@ -93,7 +95,8 @@ export function AppSidebar() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   {module.children!.map((child) => {
-                    const isActive = (child.url && pathname.startsWith(child.url)) || false
+                    const resolvedUrl = child.url?.replace("__PROFILE__", String(user?.id ?? "")) ?? "#"
+                    const isActive = (child.url && pathname.startsWith(resolvedUrl)) || false
                     return (
                       <SidebarMenuItem key={child.key}>
                         <SidebarMenuButton
@@ -102,7 +105,7 @@ export function AppSidebar() {
                           className="text-sm"
                           tooltip={child.name}
                         >
-                          <Link href={child.url ?? "#"}>
+                          <Link href={resolvedUrl}>
                             {child.name}
                           </Link>
                         </SidebarMenuButton>

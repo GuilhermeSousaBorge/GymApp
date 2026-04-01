@@ -1,14 +1,16 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ErrorState } from "@/components/ui/error-state"
+import { LoadingState } from "@/components/ui/loading-state"
 import { useAdminDashboard } from "@/hooks/dashboard"
 import { AlertCircle, Dumbbell, TrendingUp, UserCheck } from "lucide-react"
 
 export const AdminDashboard = () => {
     const { data, isLoading, error } = useAdminDashboard()
 
-    if (isLoading) return <>Carregando dashboard...</>
-    if (error) return <>Erro ao carregar dashboard</>
+    if (isLoading) return <LoadingState message="Carregando dashboard..." />
+    if (error) return <ErrorState message="Erro ao carregar dashboard" />
 
     return (
         <div className="flex flex-col gap-6">
