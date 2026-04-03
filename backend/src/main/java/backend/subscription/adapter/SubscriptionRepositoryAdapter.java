@@ -62,5 +62,15 @@ public class SubscriptionRepositoryAdapter
         log.debug("SubscriptionRepositoryAdapter: countByStatus({})", status);
         return repository.countByStatus(status);
     }
+
+    @Override
+    public List<Subscription> findByStatus(SubscriptionStatus status) {
+        return repository.findByStatus(status);
+    }
+
+    @Override
+    public List<Subscription> findAll() {
+        return repository.findAll();
+    }
 }
 

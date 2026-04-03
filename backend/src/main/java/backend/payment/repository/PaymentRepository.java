@@ -22,5 +22,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             @Param("start") LocalDate start,
             @Param("end") LocalDate end
     );
+
+    List<Payment> findByStatus(PaymentStatus status);
 }
 

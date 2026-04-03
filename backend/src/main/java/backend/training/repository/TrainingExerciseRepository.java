@@ -33,6 +33,16 @@ public interface TrainingExerciseRepository extends JpaRepository<TrainingExerci
     """)
     List<TrainingExercise> findBySheetWithExercise(@Param("sheetId") Long sheetId);
 
+    @Query("""
+        SELECT te FROM TrainingExercise te
+        JOIN FETCH te.trainingSheet ts
+        JOIN FETCH te.exercise e
+        JOIN FETCH e.category
+        WHERE ts.trainingProgram.id = :programId
+        ORDER BY ts.orderInProgram ASC, te.orderInSheet ASC
+    """)
+    List<TrainingExercise> findByProgramWithExercise(@Param("programId") Long programId);
+
     // ⭐ Verificar se exercício já está na folha
     boolean existsByTrainingSheetIdAndExerciseId(Long sheetId, Long exerciseId);
 

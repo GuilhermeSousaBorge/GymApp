@@ -5,6 +5,8 @@
 - Fase 1 (DIP): concluida e consolidada com ports/adapters.
 - Fase 2 (SRP + UseCases): concluida no fluxo HTTP.
 - Fase 3 (consolidacao ports/adapters): concluida.
+- Fase 4 (OCP): concluida formalmente (base + hardening A/B/C + estabilizacao).
+- Fase 5 (LSP): planejada e pronta para inicio (`SOLID_PHASE_5_PLAN.md`).
 - Build: compilacao limpa valida com `clean -DskipTests compile`.
 - Auditoria final de UseCases executada (metodo `execute`, `@Transactional`, `log.info`).
 - Teste de contexto validado com PostgreSQL ativo em `localhost:5433`.
@@ -74,8 +76,8 @@ Resultado mais recente:
 
 ## Proximo foco recomendado
 
-- Fase 4 (OCP): evoluir extensibilidade com estrategias/fabricas sem quebrar contratos existentes.
-- Consolidar backlog de melhoria continua com validacoes incrementais por modulo.
+- Iniciar Fase 5 (LSP) com foco em substituibilidade de contratos (`Port`/`Adapter`) sem quebra de comportamento.
+- Manter backlog de cobranca avancada como trilha evolutiva paralela (nao bloqueante do gate arquitetural).
 
 ## Progresso inicial da Fase 3 (mar/2026)
 
@@ -313,12 +315,66 @@ Resultado:
   - `SOLID_PHASE_4_CONTINUITY.md`
   - `SOLID_PHASE_4_SUMMARY.md`
 
+## Fase 4 - status formal
+
+- Estado: concluida.
+- Gate de saida atendido:
+  - base OCP entregue (`plan/subscription/payment`);
+  - hardening A/B/C aplicado e validado;
+  - estabilizacao de testes e hotfix documentados.
+- Backlog residual:
+  - regras avancadas de cobranca (grace period, retry policy, estorno) seguem como evolucao funcional.
+
+## Fase 5 - planejamento oficial
+
+- Documento de inicio: `SOLID_PHASE_5_PLAN.md`.
+- Objetivo: reforcar LSP com testes de substituibilidade de contratos e invariantes por modulo.
+- Gate de inicio: documentacao sincronizada + suites de UseCase verdes.
+
 ## Ultima atualizacao
 
-- Data: 2026-03-31
+- Data: 2026-04-02
 - Evidencia tecnica recente:
   - compilacao local concluida sem erros;
-  - suites de `plan/subscription/payment` executadas com sucesso;
-  - hardening de ownership/autorizacao (Slice A) aplicado e validado;
-  - testes negativos adicionais (Slice B) aplicados e validados;
-  - observabilidade e consistencia de status (Slice C) aplicadas e validadas.
+  - ajuste de estabilidade em testes de `dashboard` para novas dependencias de `payment/subscription`;
+  - cobertura complementar adicionada para listagens por status em `payment` e `subscription`;
+  - correcao de log no endpoint de listagem de pagamentos (`status`).
+
+### Hotfix de estabilidade (abr/2026)
+
+- `GetAdminDashboardUseCaseTest` atualizado com mocks de `PaymentQueryPort` e `SubscriptionQueryPort`, evitando `NullPointerException` apos evolucao do UseCase.
+- Novos testes unitarios adicionados:
+  - `src/test/java/backend/payment/usecase/ListPaymentsByStatusUseCaseTest.java`
+  - `src/test/java/backend/subscription/usecase/ListByStatusUseCaseTest.java`
+- Validacao executada:
+
+```powershell
+Set-Location "C:\Users\Guilherme\Desktop\Workspace\GymApp\backend"
+.\mvnw.cmd -q "-Dtest=backend.dashboard.usecase.GetAdminDashboardUseCaseTest,backend.payment.usecase.ListPaymentsByStatusUseCaseTest,backend.subscription.usecase.ListByStatusUseCaseTest" test
+.\mvnw.cmd -q "-Dtest=backend.user.usecase.*Test,backend.auth.usecase.*Test,backend.dashboard.usecase.*Test,backend.training.usecase.*Test,backend.exercise.usecase.*Test,backend.plan.usecase.*Test,backend.subscription.usecase.*Test,backend.payment.usecase.*Test" test
+```
+
+## Nova funcionalidade - exportacao de treino em PDF (abr/2026)
+
+- Exportacao de treino por programa adicionada no modulo `training` com `openpdf`.
+- Novo endpoint:
+  - `GET /api/training-programs/{programId}/export/pdf`
+  - seguranca: `@ProgramOwnerOrAdmin`
+- Fluxo implementado no padrao arquitetural:
+  - `TrainingProgramController` -> `ExportTrainingProgramPdfUseCase` -> `Training*QueryPort` + `TrainingProgramPdfExporterPort` -> `PdfTrainingProgramExporterAdapter`.
+- Nome de arquivo padrao:
+  - `programa-{programName}-{userName}.pdf` (sanitizado para slug ASCII).
+- Comportamento para programa sem folhas:
+  - PDF valido gerado com a mensagem: `Programa sem folhas de treino cadastradas`.
+- Cobertura de testes adicionada:
+  - `src/test/java/backend/training/usecase/ExportTrainingProgramPdfUseCaseTest.java`
+  - `src/test/java/backend/training/adapter/PdfTrainingProgramExporterAdapterTest.java`
+- Validacao executada:
+
+```powershell
+Set-Location "C:\Users\Guilherme\Desktop\Workspace\GymApp\backend"
+.\mvnw.cmd -q clean -DskipTests compile
+.\mvnw.cmd -q "-Dtest=backend.training.usecase.ExportTrainingProgramPdfUseCaseTest,backend.training.adapter.PdfTrainingProgramExporterAdapterTest" test
+.\mvnw.cmd -q "-Dtest=backend.training.usecase.*Test" test
+```
+

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ErrorState } from "@/components/ui/error-state"
 import { LoadingState } from "@/components/ui/loading-state"
 import { PageHeader } from "@/components/ui/page-header"
@@ -13,7 +12,7 @@ import { usePrograms } from "@/hooks/training-program"
 import { useUsers } from "@/hooks/user"
 import { formatDate, isAdmin } from "@/lib/utils"
 import { useUser } from "@/stores/auth"
-import { ClipboardList, Plus, Search } from "lucide-react"
+import { ClipboardList, Plus, Search, User, Dumbbell, Calendar } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
@@ -77,60 +76,50 @@ export function TrainingProgramList() {
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-base">Lista de programas</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Nome</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Aluno</TableHead>
-                                <TableHead>Instrutor</TableHead>
-                                <TableHead>Criado em</TableHead>
-                                <TableHead className="text-right">Ações</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filtered.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={6} className="text-center text-muted-foreground py-10">
-                                        Nenhum programa encontrado
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                filtered.map((program) => (
-                                    <TableRow key={program.id}>
-                                        <TableCell className="font-medium">{program.name}</TableCell>
-                                        <TableCell>
-                                            <StatusBadge active={program.active} />
-                                        </TableCell>
-                                        <TableCell>{program.student?.name ?? "-"}</TableCell>
-                                        <TableCell className="text-muted-foreground">
-                                            {program.trainer?.name ?? "Sem personal"}
-                                        </TableCell>
-                                        <TableCell className="text-muted-foreground">
-                                            {formatDate(new Date(program.createdAt))}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <Button asChild variant="outline" size="sm">
-                                                    <Link href={`/training-programs/${program.id}/edit`}>Editar</Link>
-                                                </Button>
-                                                <Button asChild variant="outline" size="sm">
-                                                    <Link href={`/training-sheets/${program.id}`}>Fichas</Link>
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+            {filtered.length === 0 ? (
+                <Card>
+                    <CardContent className="py-10 text-center text-muted-foreground">
+                        Nenhum programa encontrado
+                    </CardContent>
+                </Card>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filtered.map((program) => (
+                        <Card key={program.id} className="flex flex-col">
+                            <CardHeader className="pb-3">
+                                <div className="flex items-center justify-between">
+                                    <CardTitle className="text-base font-semibold">{program.name}</CardTitle>
+                                    <StatusBadge active={program.active} />
+                                </div>
+                            </CardHeader>
+                            <CardContent className="flex flex-col gap-3 flex-1">
+                                <div className="flex flex-col gap-2 text-sm flex-1">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <User className="h-3.5 w-3.5 shrink-0" />
+                                        <span>Aluno: <span className="text-foreground">{program.student?.name ?? "-"}</span></span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Dumbbell className="h-3.5 w-3.5 shrink-0" />
+                                        <span>Instrutor: <span className="text-foreground">{program.trainer?.name ?? "Sem personal"}</span></span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Calendar className="h-3.5 w-3.5 shrink-0" />
+                                        <span>{formatDate(new Date(program.createdAt))}</span>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2 pt-2">
+                                    <Button asChild variant="outline" size="sm" className="flex-1">
+                                        <Link href={`/training-programs/${program.id}/edit`}>Editar</Link>
+                                    </Button>
+                                    <Button asChild variant="outline" size="sm" className="flex-1">
+                                        <Link href={`/training-sheets/${program.id}`}>Fichas</Link>
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )}
         </div>
     )
 }

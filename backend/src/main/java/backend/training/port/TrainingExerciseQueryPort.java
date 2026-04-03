@@ -46,6 +46,8 @@ public interface TrainingExerciseQueryPort {
 
     java.util.List<TrainingExercise> findBySheetWithExercise(Long sheetId);
 
+    java.util.List<TrainingExercise> findByProgramWithExercise(Long programId);
+
     boolean existsBySheetAndExercise(Long sheetId, Long exerciseId);
 
     int countBySheet(Long sheetId);

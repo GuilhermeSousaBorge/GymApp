@@ -3,7 +3,9 @@ package backend.payment.controller;
 import backend.infrastructure.security.IsAdminOrTrainer;
 import backend.payment.dto.CreatePaymentRequest;
 import backend.payment.dto.PaymentResponse;
+import backend.payment.model.enums.PaymentStatus;
 import backend.payment.usecase.CreatePaymentUseCase;
+import backend.payment.usecase.ListPaymentsByStatusUseCase;
 import backend.payment.usecase.ListPaymentsBySubscriptionUseCase;
 import backend.payment.usecase.MarkPaymentAsPaidUseCase;
 import jakarta.validation.Valid;
@@ -27,6 +29,7 @@ public class PaymentController {
     private final CreatePaymentUseCase createPaymentUseCase;
     private final MarkPaymentAsPaidUseCase markPaymentAsPaidUseCase;
     private final ListPaymentsBySubscriptionUseCase listPaymentsBySubscriptionUseCase;
+    private final ListPaymentsByStatusUseCase listPaymentsByStatusUseCase;
 
     @PostMapping
     @IsAdminOrTrainer
@@ -48,6 +51,15 @@ public class PaymentController {
                                                                     Authentication authentication) {
         log.info("GET /api/payments/subscriptions/{}", subscriptionId);
         return ResponseEntity.ok(listPaymentsBySubscriptionUseCase.execute(subscriptionId, authentication));
+    }
+
+    @GetMapping
+    @IsAdminOrTrainer
+    public ResponseEntity<List<PaymentResponse>> listByStatus(
+            @RequestParam (required = false) PaymentStatus status){
+        log.info("GET /api/payments?status={}", status);
+
+        return ResponseEntity.ok(listPaymentsByStatusUseCase.execute(status));
     }
 }
 

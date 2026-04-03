@@ -2,14 +2,13 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ErrorState } from "@/components/ui/error-state"
 import { LoadingState } from "@/components/ui/loading-state"
 import { PageHeader } from "@/components/ui/page-header"
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog"
 import { useDeleteTrainingExercise, useTrainingExercises } from "@/hooks/training-exercise"
 import { handleMessageError } from "@/lib/handle-error"
-import { Dumbbell, Plus } from "lucide-react"
+import { Dumbbell, Plus, Repeat, Layers, Clock, FileText } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -52,58 +51,64 @@ export function TrainingExerciseList({ sheetId }: TrainingExerciseListProps) {
                 }}
             />
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-base">Exercícios da ficha</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Nome</TableHead>
-                                <TableHead>Séries</TableHead>
-                                <TableHead>Repetições</TableHead>
-                                <TableHead>Notas técnicas</TableHead>
-                                <TableHead>Ações</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {exercises.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={5} className="text-center text-muted-foreground py-10">
-                                        Essa ficha não possui exercícios
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                exercises.map((exercise) => (
-                                    <TableRow key={exercise.id}>
-                                        <TableCell>{exercise.exerciseInfo?.name}</TableCell>
-                                        <TableCell>{exercise.sets}</TableCell>
-                                        <TableCell>{exercise.reps}</TableCell>
-                                        <TableCell>{exercise.techniqueNotes}</TableCell>
-                                        <TableCell>
-                                            <div className="flex gap-2">
-                                                <Button asChild variant="outline" size="sm">
-                                                    <Link href={`/training-exercises/${sheetId}/${exercise.id}/edit`}>
-                                                        Ver detalhes
-                                                    </Link>
-                                                </Button>
-                                                <Button
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    onClick={() => setDeleteId(exercise.id)}
-                                                >
-                                                    Excluir
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+            {exercises.length === 0 ? (
+                <Card>
+                    <CardContent className="py-10 text-center text-muted-foreground">
+                        Essa ficha não possui exercícios
+                    </CardContent>
+                </Card>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {exercises.map((exercise) => (
+                        <Card key={exercise.id} className="flex flex-col">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base font-semibold">
+                                    {exercise.exerciseInfo?.name ?? "Exercício"}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex flex-col gap-3 flex-1">
+                                <div className="flex flex-col gap-2 text-sm flex-1">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Layers className="h-3.5 w-3.5 shrink-0" />
+                                        <span>Séries: <span className="text-foreground font-medium">{exercise.sets}</span></span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Repeat className="h-3.5 w-3.5 shrink-0" />
+                                        <span>Repetições: <span className="text-foreground font-medium">{exercise.reps}</span></span>
+                                    </div>
+                                    {exercise.restTimeInSeconds && (
+                                        <div className="flex items-center gap-2 text-muted-foreground">
+                                            <Clock className="h-3.5 w-3.5 shrink-0" />
+                                            <span>Descanso: <span className="text-foreground">{exercise.restTimeInSeconds}s</span></span>
+                                        </div>
+                                    )}
+                                    {exercise.techniqueNotes && (
+                                        <div className="flex items-start gap-2 text-muted-foreground">
+                                            <FileText className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                                            <span className="text-foreground text-xs leading-relaxed">{exercise.techniqueNotes}</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex gap-2 pt-2">
+                                    <Button asChild variant="outline" size="sm" className="flex-1">
+                                        <Link href={`/training-exercises/${sheetId}/${exercise.id}/edit`}>
+                                            Ver detalhes
+                                        </Link>
+                                    </Button>
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        className="flex-1"
+                                        onClick={() => setDeleteId(exercise.id)}
+                                    >
+                                        Excluir
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )}
 
             <DeleteConfirmDialog
                 open={deleteId !== null}

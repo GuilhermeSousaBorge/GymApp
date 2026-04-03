@@ -17,5 +17,9 @@ public interface PaymentQueryPort {
     long countByStatus(PaymentStatus status);
 
     BigDecimal sumAmountByStatusAndPaymentDateBetween(PaymentStatus status, LocalDate start, LocalDate end);
+
+    List<Payment> findByStatus(PaymentStatus status);
+
+    List<Payment> findAll();
 }
 

@@ -15,5 +15,9 @@ public interface SubscriptionQueryPort {
     List<Subscription> findByUserId(Long userId);
 
     long countByStatus(SubscriptionStatus status);
+
+    List<Subscription> findByStatus(SubscriptionStatus status);
+
+    List<Subscription> findAll();
 }
 

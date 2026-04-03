@@ -57,6 +57,12 @@ public class TrainingExerciseRepositoryAdapter implements TrainingExerciseQueryP
     }
 
     @Override
+    public List<TrainingExercise> findByProgramWithExercise(Long programId) {
+        log.debug("TrainingExerciseRepositoryAdapter: findByProgramWithExercise({})", programId);
+        return trainingExerciseRepository.findByProgramWithExercise(programId);
+    }
+
+    @Override
     public boolean existsBySheetAndExercise(Long sheetId, Long exerciseId) {
         log.debug("TrainingExerciseRepositoryAdapter: existsBySheetAndExercise({}, {})", sheetId, exerciseId);
         return trainingExerciseRepository.existsByTrainingSheetIdAndExerciseId(sheetId, exerciseId);

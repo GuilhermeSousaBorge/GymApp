@@ -4,8 +4,10 @@ import backend.infrastructure.exception.UnauthorizedException;
 import backend.infrastructure.security.IsAdminOrTrainer;
 import backend.subscription.dto.CreateSubscriptionRequest;
 import backend.subscription.dto.SubscriptionResponse;
+import backend.subscription.model.enums.SubscriptionStatus;
 import backend.subscription.usecase.CancelSubscriptionUseCase;
 import backend.subscription.usecase.CreateSubscriptionUseCase;
+import backend.subscription.usecase.ListByStatusUseCase;
 import backend.subscription.usecase.GetActiveSubscriptionByUserUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/subscriptions")
@@ -26,6 +30,7 @@ public class SubscriptionController {
     private final CreateSubscriptionUseCase createSubscriptionUseCase;
     private final CancelSubscriptionUseCase cancelSubscriptionUseCase;
     private final GetActiveSubscriptionByUserUseCase getActiveSubscriptionByUserUseCase;
+    private final ListByStatusUseCase listByStatusUseCase;
 
     @PostMapping
     @IsAdminOrTrainer
@@ -57,6 +62,15 @@ public class SubscriptionController {
         }
         log.info("GET /api/subscriptions/me/active - userId={}", userId);
         return ResponseEntity.ok(getActiveSubscriptionByUserUseCase.execute(userId, authentication));
+    }
+
+    @GetMapping
+    @IsAdminOrTrainer
+    public ResponseEntity<List<SubscriptionResponse>> listByStatus(
+            @RequestParam (required = false) SubscriptionStatus status){
+        log.info("GET /api/subscriptions?status={}", status);
+
+        return ResponseEntity.ok(listByStatusUseCase.execute(status));
     }
 }
 

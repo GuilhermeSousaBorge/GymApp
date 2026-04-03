@@ -1,6 +1,7 @@
 package backend.training.controller;
 
 import backend.training.dto.TrainingProgramRequest;
+import backend.training.dto.TrainingProgramPdfFileResponse;
 import backend.training.dto.TrainingProgramUpdateRequest;
 import backend.training.dto.TrainingProgramResponse;
 import backend.infrastructure.security.ProgramOwnerOrAdmin;
@@ -8,7 +9,9 @@ import backend.training.usecase.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +32,7 @@ public class TrainingProgramController {
     private final ActivateProgramUseCase activateProgramUseCase;
     private final DeactivateProgramUseCase deactivateProgramUseCase;
     private final DeleteProgramUseCase deleteProgramUseCase;
+    private final ExportTrainingProgramPdfUseCase exportTrainingProgramPdfUseCase;
 
     @PostMapping
     public ResponseEntity<TrainingProgramResponse> createProgram(
@@ -123,5 +127,18 @@ public class TrainingProgramController {
         deleteProgramUseCase.execute(programId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{programId}/export/pdf")
+    @ProgramOwnerOrAdmin
+    public ResponseEntity<byte[]> exportProgramPdf(@PathVariable Long programId) {
+        log.info("GET /api/training-programs/{}/export/pdf", programId);
+
+        TrainingProgramPdfFileResponse file = exportTrainingProgramPdfUseCase.execute(programId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(file.getContentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFileName() + "\"")
+                .body(file.getContent());
     }
 }

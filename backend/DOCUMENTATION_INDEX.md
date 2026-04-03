@@ -1,7 +1,7 @@
 # Documentacao - Indice Atual (Mar/2026)
 
 Projeto: `backend` (GymApp)  
-Status SOLID: Fase 1 concluida, Fase 2 concluida no fluxo HTTP, Fase 3 concluida, Fase 4 em execucao (base + Slice A/B/C concluidos em 2026-03-31)
+Status SOLID: Fase 1 concluida, Fase 2 concluida no fluxo HTTP, Fase 3 concluida, Fase 4 concluida (encerramento formal), Fase 5 planejada
 
 ## Leia primeiro
 
@@ -26,13 +26,16 @@ Status SOLID: Fase 1 concluida, Fase 2 concluida no fluxo HTTP, Fase 3 concluida
 6. `SOLID_PHASE_4_CONTINUITY.md`
 - Guia de continuidade da Fase 4 (slices, checklist de PR, validacao)
 
-7. `GUIA_ARQUITETURA_PROJETO.md`
+7. `SOLID_PHASE_5_PLAN.md`
+- Plano oficial da Fase 5 (LSP): escopo, slices, DoD e gate de Go/No-Go
+
+8. `GUIA_ARQUITETURA_PROJETO.md`
 - Guia detalhado da estrutura, arquitetura e decisoes tecnicas para estudo e replicacao
 
-8. `GUIA_ARQUITETURA_PROJETO_V2.md`
+9. `GUIA_ARQUITETURA_PROJETO_V2.md`
 - Versao com diagramas textuais, template SOLID copiavel e checklist de PR arquitetural
 
-9. `FRONTEND_HANDOFF_2026-03-31.md`
+10. `FRONTEND_HANDOFF_2026-03-31.md`
 - Handoff operacional para o frontend com contratos reais, roles, ownership, status e formato de erro
 
 ## Fonte de verdade (manter atualizada)
@@ -44,6 +47,7 @@ Status SOLID: Fase 1 concluida, Fase 2 concluida no fluxo HTTP, Fase 3 concluida
 - `SOLID_PHASE_4_PLAN.md`
 - `SOLID_PHASE_4_CONTINUITY.md`
 - `SOLID_PHASE_4_SUMMARY.md`
+- `SOLID_PHASE_5_PLAN.md`
 - `GUIA_ARQUITETURA_PROJETO.md`
 - `GUIA_ARQUITETURA_PROJETO_V2.md`
 - `FRONTEND_HANDOFF_2026-03-31.md`
@@ -81,16 +85,12 @@ Obs: esses arquivos preservam contexto de sessoes anteriores e da execucao da fa
 - UseCases dos modulos principais nao importam mais `*.repository.*` diretamente.
 - Dependencias cross-modulo entre `training`, `exercise` e `user` estao intermediadas por portas.
 - Testes de UseCase de `auth`, `dashboard` e leituras residuais de `training` foram ajustados para mockar portas.
-- Fase 4 base concluida com modulos `plan`, `subscription` e `payment`.
-- Slice A de hardening concluido: ownership/autorizacao nas leituras de assinatura e pagamento.
-- Slice B de testes negativos concluido para `CreateSubscriptionUseCase`, `CreatePaymentUseCase` e `MarkPaymentAsPaidUseCase`.
-- Regras de dominio endurecidas em pagamento:
-  - `CreatePaymentUseCase` valida `subscriptionId`, `amount`, `dueDate`, `paymentMethod`.
-  - `MarkPaymentAsPaidUseCase` permite apenas `PENDING -> PAID`.
-- Slice C concluido com observabilidade e consistencia de transicoes:
-  - logs de evento de status padronizados nos fluxos de escrita de `subscription` e `payment`;
-  - bloqueio de `EXPIRED -> CANCELLED` em assinatura;
-  - criacao de pagamento apenas com status inicial `PENDING`.
+- Fase 4 concluida formalmente com modulos `plan`, `subscription` e `payment` estabilizados.
+- Hardening A/B/C consolidado e validado (ownership/autorizacao, testes negativos, observabilidade e consistencia de status).
+- Exportacao de treino em PDF por programa adicionada em `training`:
+  - endpoint `GET /api/training-programs/{programId}/export/pdf`;
+  - arquivo `programa-{programName}-{userName}.pdf`;
+  - quando nao ha folhas, PDF inclui mensagem orientativa.
 
 ## Comandos de validacao rapida (PowerShell)
 
@@ -102,9 +102,6 @@ Set-Location "C:\Users\Guilherme\Desktop\Workspace\GymApp\backend"
 
 ## Proximo bloco de trabalho recomendado
 
-- Fase 4 / extensibilidade (OCP) — **implementacao base concluida**:
-  - `plan`: CRUD completo em UseCases + Ports + Adapter + Controller.
-  - `subscription`: `Create`, `Cancel`, `GetActiveByUser`.
-  - `payment`: `Create`, `MarkAsPaid`, `ListBySubscription`.
-  - migracoes novas: `V10`, `V11`, `V12`.
-- Proximo foco: evoluir regras avancadas de cobranca (grace period, retry policy e estorno) sem quebrar contratos atuais, conforme `SOLID_PHASE_4_CONTINUITY.md`.
+- Fase 5 / LSP — **planejamento oficial publicado** em `SOLID_PHASE_5_PLAN.md`.
+- Foco imediato: validar substituibilidade de portas/adapters sem quebrar contrato de UseCase, DTO e comportamento HTTP.
+- Backlog avancado de cobranca (grace period, retry policy, estorno) permanece evolutivo e nao bloqueia o inicio da Fase 5.
