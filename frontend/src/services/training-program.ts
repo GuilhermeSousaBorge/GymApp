@@ -40,5 +40,16 @@ export const trainingProgramService = {
     async deactivate(id: number) {
         const response = await api.patch(`${BASE_URL}/${id}/deactivate`)
         return response.data
+    },
+
+    async exportTraining(programId: number) {
+        const response = await api.get(`${BASE_URL}/${programId}/export/pdf`, {
+            responseType: "blob"
+        })
+        const disposition = response.headers['content-disposition']
+        const filename = disposition?.match(/filename="(.+)"/)?.[1] ?? `programa-${programId}.pdf`
+        const blob = new Blob([response.data], { type: "application/pdf" })
+        const url = URL.createObjectURL(blob)
+        return {url, filename};
     }
 }

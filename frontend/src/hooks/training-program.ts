@@ -46,3 +46,14 @@ export const useDeactivateProgram = () => useMutation({
     mutationFn: (id: number) => trainingProgramService.deactivate(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["training-program"] })
 })
+
+export const useExportProgramToPdf = () => useMutation({
+    mutationFn: (programId: number) => trainingProgramService.exportTraining(programId),
+    onSuccess: ({ url, filename }) => {
+        const link = document.createElement("a")
+        link.href = url
+        link.download = filename
+        link.click()
+        URL.revokeObjectURL(url)
+    }
+})

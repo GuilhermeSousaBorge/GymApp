@@ -18,12 +18,16 @@ import org.springframework.stereotype.Component;
  * Padrão Adapter + Strategy
  */
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class CredentialValidatorAdapter implements CredentialValidatorPort {
     
     private final UserQueryPort userQueryPort;
     private final PasswordEncoder passwordEncoder;
+
+    public CredentialValidatorAdapter(UserQueryPort userQueryPort, PasswordEncoder passwordEncoder){
+        this.passwordEncoder = passwordEncoder;
+        this.userQueryPort = userQueryPort;
+    }
     
     @Override
     public boolean validateCredentials(Email email, String rawPassword) {

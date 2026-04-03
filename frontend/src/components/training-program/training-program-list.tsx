@@ -2,17 +2,17 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ErrorState } from "@/components/ui/error-state"
+import { Input } from "@/components/ui/input"
 import { LoadingState } from "@/components/ui/loading-state"
 import { PageHeader } from "@/components/ui/page-header"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { StatusBadge } from "@/components/ui/status-badge"
-import { usePrograms } from "@/hooks/training-program"
+import { useExportProgramToPdf, usePrograms } from "@/hooks/training-program"
 import { useUsers } from "@/hooks/user"
 import { formatDate, isAdmin } from "@/lib/utils"
 import { useUser } from "@/stores/auth"
-import { ClipboardList, Plus, Search, User, Dumbbell, Calendar } from "lucide-react"
+import { Calendar, ClipboardList, Dumbbell, FileTextIcon, Plus, Search, User } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
@@ -23,6 +23,7 @@ export function TrainingProgramList() {
 
     const { data: users = [], isLoading: isLoadingUsers, error: userError } = useUsers()
     const { data: programs = [], isLoading: isLoadingPrograms, error: programError } = usePrograms(programParams)
+    const { mutateAsync: exportPdf, isPending} = useExportProgramToPdf()
 
     const [search, setSearch] = useState("")
     const [userFilter, setUserFilter] = useState("all")
@@ -113,6 +114,9 @@ export function TrainingProgramList() {
                                     </Button>
                                     <Button asChild variant="outline" size="sm" className="flex-1">
                                         <Link href={`/training-sheets/${program.id}`}>Fichas</Link>
+                                    </Button>
+                                    <Button variant="outline" size="sm" className="flex-1 cursor-pointer" onClick={() => exportPdf(program.id)} disabled={isPending}>
+                                        Exportar treino<FileTextIcon />
                                     </Button>
                                 </div>
                             </CardContent>

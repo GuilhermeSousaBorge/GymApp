@@ -1,6 +1,6 @@
 import { api } from "@/lib/api"
 import { PaymentFormData } from "@/lib/validations/payment"
-import { Payment } from "@/types/payment"
+import { Payment, PaymentStatus } from "@/types/payment"
 
 const BASE_URL = "/payments"
 
@@ -17,6 +17,13 @@ export const paymentService = {
 
     async listBySubscription(subscriptionId: number): Promise<Payment[]> {
         const response = await api.get(`${BASE_URL}/subscriptions/${subscriptionId}`)
+        return response.data
+    },
+
+    async listAll(status?: PaymentStatus): Promise<Payment[]> {
+        const response = await api.get(BASE_URL, {
+            params: status ? { status } : undefined,
+        })
         return response.data
     },
 }
