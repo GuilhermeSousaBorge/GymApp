@@ -31,7 +31,7 @@ export const LoginForm = () => {
       setLoading(true)
 
       const response = await authService.login(data)
-      login(response)
+      login(response.user, response.token)
 
       router.push("/dashboard")
     }catch(err){

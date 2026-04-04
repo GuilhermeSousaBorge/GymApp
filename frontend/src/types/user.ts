@@ -21,3 +21,8 @@ export type User = {
   createdAt?: Date
   updatedAt?: Date
 }
+
+export type Auth = {
+  user: User
+  token: string
+}
