@@ -19,7 +19,8 @@ export const useSheets = (params: Params) =>
 export const useSheetDetails = (id: number | undefined) =>
     useQuery({
         queryKey: ["training-sheet", id],
-        queryFn: () => trainingSheetService.details(id)
+        queryFn: () => trainingSheetService.details(id),
+        enabled: !!id
     })
 
 export const useCreateSheet = () => {
@@ -28,7 +29,7 @@ export const useCreateSheet = () => {
         mutationFn: (sheet: TrainingSheetFormData) => trainingSheetService.create(sheet),
         onSuccess: (createdSheet) => {
             queryClient.invalidateQueries({ queryKey: ["training-sheets"] })
-            router.push(`/training-sheet/${createdSheet.id}/edit`)
+            router.push(`/training-sheets/${createdSheet.trainingProgramId}/${createdSheet.id}/edit`)
         }
     })
 }

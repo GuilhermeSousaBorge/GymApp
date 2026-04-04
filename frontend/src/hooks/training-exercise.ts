@@ -34,3 +34,8 @@ export const useUpdateTrainingExercise = () => useMutation({
     mutationFn: ({ id, exercise }: { id: number, exercise: TrainingExerciseFormData }) => trainingExerciseService.edit(id, exercise),
     onSuccess: (updatedTrainingExercise) => queryClient.invalidateQueries({ queryKey: ["training-exercise", updatedTrainingExercise.id] })
 })
+
+export const useDeleteTrainingExercise = () => useMutation({
+    mutationFn: (id: number) => trainingExerciseService.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["training-exercises"] })
+})

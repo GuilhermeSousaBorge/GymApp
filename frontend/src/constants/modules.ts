@@ -13,7 +13,7 @@ export const modules: Module[] = [
             {
                 key: "users-profile",
                 name: "Meu Perfil",
-                url: "/users"
+                url: "/users/__PROFILE__/edit"
             },
             {
                 key: "users-list-all",
@@ -33,12 +33,7 @@ export const modules: Module[] = [
                 url: "/users/new/edit",
                 permission: ["Administrador"],
             },
-            {
-                key: "users-role",
-                name: "Gerenciar cargos",
-                url: "/role",
-                permission: ["Administrador"]
-            },
+
         ],
     },
     {
@@ -86,56 +81,26 @@ export const modules: Module[] = [
             }
         ],
     },
-    // {
-    //     key: "reports",
-    //     name: "Relatórios",
-    //     url: "",
-    //     children: [
-    //         {
-    //             key: "reports-general",
-    //             name: "Visão geral"
-    //         },
-    //         {
-    //             key: "repo-by-student",
-    //             name: "Por aluno"
-    //         },
-    //         {
-    //             key: "repo-by-trainer",
-    //             name: "Por treinador"
-    //         }
-    //     ]
-    // },
-    // {
-    //     key: "config",
-    //     name: "Configurações",
-    //     url: "",
-    //     children: [
-    //         {
-    //             key: "config-system",
-    //             name: "Sistema"
-    //         },
-    //         {
-    //             key: "config-permission",
-    //             name: "Permissões"
-    //         },
-    //     ]
-    // },
-    // {
-    //   key: "payments",
-    //   name: "Pagamentos",
-    //   children: [
-    //     {
-    //       key: "payments-list",
-    //       name: "Lista de pagamentos",
-    //       url: "/payments/list",
-    //       permission: ["admin", "payments.manage", "payments.read"]
-    //     },
-    //     {
-    //       key: "payments-me",
-    //       url: "/payments/myPayments",
-    //       name: "Meus pagamentos",
-    //     },
-    //   ]
-    // },
+    {
+        key: "financial",
+        name: "Financeiro",
+        children: [
+            {
+                key: "plans-list",
+                name: "Planos",
+                url: "/plans",
+            },
+            {
+                key: "subscriptions",
+                name: "Inscrições",
+                url: "/subscriptions",
+            },
+            {
+                key: "payments",
+                name: "Pagamentos",
+                url: "/payments",
+            },
+        ],
+    },
 
 ];

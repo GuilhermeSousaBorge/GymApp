@@ -28,7 +28,8 @@ public class CorsConfig {
                 "POST",
                 "PUT",
                 "DELETE",
-                "OPTIONS"
+                "OPTIONS",
+                "PATCH"
         ));
 
         // Headers permitidos

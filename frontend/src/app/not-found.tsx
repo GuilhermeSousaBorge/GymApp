@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { BackButton } from "@/components/ui/back-button"
 import { FileQuestion } from "lucide-react"
 import Link from "next/link"
 
@@ -26,9 +27,7 @@ export default function NotFound() {
         </div>
 
         <div className="flex gap-3">
-          <Button asChild variant="outline">
-            <Link href="javascript:history.back()">Voltar</Link>
-          </Button>
+          <BackButton />
           <Button asChild className="bg-yellow-400 text-zinc-900 hover:bg-yellow-500">
             <Link href="/dashboard">Ir ao início</Link>
           </Button>
