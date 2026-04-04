@@ -60,4 +60,4 @@ management:
         include: health
 cookie:
   secure: ${COOKIE_SECURE:true}
-  same-site: None
+  same-site: ${SAME_SITE_SECURE:None}
