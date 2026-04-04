@@ -19,7 +19,7 @@ public class CorsConfig {
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
                 "http://localhost:3001",
-                "https://gym-app-chi-rose.vercel.app/"
+                "https://gym-app-chi-rose.vercel.app"
         ));
 
         // Métodos permitidos
