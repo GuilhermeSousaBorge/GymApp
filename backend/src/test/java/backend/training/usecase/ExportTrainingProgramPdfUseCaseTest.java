@@ -80,7 +80,7 @@ class ExportTrainingProgramPdfUseCaseTest {
         when(exerciseQueryPort.findByProgramWithExercise(1L)).thenReturn(List.of(trainingExercise));
         when(pdfExporterPort.generate(any(TrainingProgramExportData.class))).thenReturn(new byte[]{1, 2, 3});
 
-        TrainingProgramPdfFileResponse result = useCase.execute(1L);
+        TrainingProgramPdfFileResponse result = useCase.execute(1L, "simple");
 
         assertEquals("application/pdf", result.getContentType());
         assertEquals("programa-hipertrofia-avancada-joao-da-silva.pdf", result.getFileName());
@@ -108,7 +108,7 @@ class ExportTrainingProgramPdfUseCaseTest {
         when(exerciseQueryPort.findByProgramWithExercise(2L)).thenReturn(List.of());
         when(pdfExporterPort.generate(any(TrainingProgramExportData.class))).thenReturn(new byte[]{9});
 
-        TrainingProgramPdfFileResponse result = useCase.execute(2L);
+        TrainingProgramPdfFileResponse result = useCase.execute(2L, "medium");
 
         assertEquals("programa-basico-maria.pdf", result.getFileName());
         assertArrayEquals(new byte[]{9}, result.getContent());
@@ -133,7 +133,7 @@ class ExportTrainingProgramPdfUseCaseTest {
         when(exerciseQueryPort.findByProgramWithExercise(3L)).thenReturn(List.of());
         when(pdfExporterPort.generate(any(TrainingProgramExportData.class))).thenReturn(new byte[]{7});
 
-        useCase.execute(3L);
+        useCase.execute(3L, "elaborated");
 
         ArgumentCaptor<TrainingProgramExportData> captor = ArgumentCaptor.forClass(TrainingProgramExportData.class);
         verify(pdfExporterPort).generate(captor.capture());
@@ -144,7 +144,7 @@ class ExportTrainingProgramPdfUseCaseTest {
     void executeShouldThrowWhenProgramNotFound() {
         when(programQueryPort.findByIdWithSheets(99L)).thenReturn(Optional.empty());
 
-        BadRequestException ex = assertThrows(BadRequestException.class, () -> useCase.execute(99L));
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> useCase.execute(99L, "elaborated"));
 
         assertEquals("Programa nao encontrado", ex.getMessage());
     }
