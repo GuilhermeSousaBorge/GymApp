@@ -44,7 +44,7 @@ public class AuthController {
     @Value("${cookie.secure}")
     private Boolean secure;
 
-    @Value("samesite.secure")
+    @Value("${cookie.same-site}")
     private String sameSite;
 
     private final LoginUseCase loginUseCase;

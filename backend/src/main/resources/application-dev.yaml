@@ -70,8 +70,7 @@ jwt:
 
 cookie:
   secure:
-SAMESITE:
-  secure: "Lax"
+  same-site: Lax
 # ===============================
 # LOGGING
 # ===============================
