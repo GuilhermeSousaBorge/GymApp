@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { Gender, User } from "@/types/user";
+import { Auth, Gender, User } from "@/types/user";
 
 type LoginPayload = {
   email: string;
@@ -16,12 +16,12 @@ type RegisterPayload = {
 
 
 export const authService = {
-  async login(payload: LoginPayload): Promise<User>{
+  async login(payload: LoginPayload): Promise<Auth>{
     const response = await api.post("/auth/login", payload);
     return response.data;
   },
 
-  async register(payload: RegisterPayload): Promise<User>{
+  async register(payload: RegisterPayload): Promise<Auth>{
     const {data} = await api.post("/auth/register", payload)
     return data
   },

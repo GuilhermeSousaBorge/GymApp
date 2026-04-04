@@ -40,7 +40,7 @@ public class CorsConfig {
 
         config.setExposedHeaders(List.of("Authorization"));
 
-        // Importante pra cookie / auth
+        // Necessario para requisicoes autenticadas cross-origin
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =

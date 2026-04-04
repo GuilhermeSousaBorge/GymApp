@@ -41,7 +41,7 @@ export const RegisterForm = () => {
       const response = await authService.register(data);
 
       toast.success("Conta criada com sucesso!", { position: "top-right" });
-      login(response)
+      login(response.user, response.token)
       router.push("/dashboard")
     }catch(err){
       const message = err instanceof Error ? err.message : "Erro ao criar conta";

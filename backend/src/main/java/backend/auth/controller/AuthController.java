@@ -2,20 +2,15 @@ package backend.auth.controller;
 
 import backend.auth.dto.LoginRequest;
 import backend.auth.dto.RegisterRequest;
-import backend.auth.dto.AuthResponse;
 import backend.auth.dto.LoginResponse;
 import backend.auth.usecase.LoginUseCase;
 import backend.auth.usecase.MeUseCase;
 import backend.auth.usecase.RegisterUseCase;
 import backend.user.dto.UserResponse;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -37,15 +32,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
-
-    @Value("${jwt.expiration}")
-    private Long jwtExpiration;
-
-    @Value("${cookie.secure}")
-    private Boolean secure;
-
-    @Value("${cookie.same-site}")
-    private String sameSite;
 
     private final LoginUseCase loginUseCase;
     private final RegisterUseCase registerUseCase;
@@ -82,17 +68,12 @@ public class AuthController {
      * @RequestBody: Converte JSON do body para objeto Java
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request,
-                                              HttpServletResponse response) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         log.info("POST /api/auth/login - Email: {}", request.getEmail());
 
         LoginResponse login = loginUseCase.execute(request);
 
-        addTokenCookie(response, login.getToken());
-
-        AuthResponse authResponse = new AuthResponse(login.getUser());
-
-        return ResponseEntity.ok(authResponse);  // HTTP 200 OK
+        return ResponseEntity.ok(login);  // HTTP 200 OK
     }
 
     /**
@@ -123,17 +104,12 @@ public class AuthController {
      * }
      */
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request,
-                                                  HttpServletResponse response) {
+    public ResponseEntity<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
         log.info("POST /api/auth/register - Email: {}", request.getEmail());
 
         LoginResponse register = registerUseCase.execute(request);
-
-        addTokenCookie(response, register.getToken());
-
-        AuthResponse authResponse = new AuthResponse(register.getUser());
         return ResponseEntity.status(HttpStatus.CREATED)  // HTTP 201 CREATED
-                .body(authResponse);
+                .body(register);
     }
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
@@ -152,35 +128,9 @@ public class AuthController {
      * Backend pode implementar blacklist de tokens se necessário
      */
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletResponse response) {
+    public ResponseEntity<Void> logout() {
         log.info("POST /api/auth/logout");
-
-        clearTokenCookie(response);
         return ResponseEntity.noContent().build();  // HTTP 204 NO CONTENT
-    }
-
-    private void addTokenCookie(HttpServletResponse response, String token) {
-        ResponseCookie cookie = ResponseCookie.from("token", token)
-                .httpOnly(true)
-                .secure(secure)       // true em produção
-                .sameSite(sameSite)
-                .path("/")
-                .maxAge(jwtExpiration / 1000)
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-    }
-
-    private void clearTokenCookie(HttpServletResponse response) {
-        ResponseCookie cookie = ResponseCookie.from("token", "")
-                .httpOnly(true)
-                .secure(secure)              // true em produção (https)
-                .sameSite(sameSite)            // ESSENCIAL p/ Next.js
-                .path("/")
-                .maxAge(0)
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
 }
