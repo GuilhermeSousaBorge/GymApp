@@ -48,7 +48,7 @@ export const useDeactivateProgram = () => useMutation({
 })
 
 export const useExportProgramToPdf = () => useMutation({
-    mutationFn: (programId: number) => trainingProgramService.exportTraining(programId),
+    mutationFn: ({programId, layout}: {programId: number, layout: string}) => trainingProgramService.exportTraining(programId, layout),
     onSuccess: ({ url, filename }) => {
         const link = document.createElement("a")
         link.href = url

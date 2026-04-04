@@ -6,7 +6,7 @@ import { ErrorState } from "@/components/ui/error-state"
 import { Input } from "@/components/ui/input"
 import { LoadingState } from "@/components/ui/loading-state"
 import { PageHeader } from "@/components/ui/page-header"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { useExportProgramToPdf, usePrograms } from "@/hooks/training-program"
 import { useUsers } from "@/hooks/user"
@@ -15,6 +15,10 @@ import { useUser } from "@/stores/auth"
 import { Calendar, ClipboardList, Dumbbell, FileTextIcon, Plus, Search, User } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
+import { toast } from "sonner"
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog"
+import { Field, FieldGroup } from "../ui/field"
+import { Label } from "../ui/label"
 
 export function TrainingProgramList() {
     const user = useUser()
@@ -27,12 +31,36 @@ export function TrainingProgramList() {
 
     const [search, setSearch] = useState("")
     const [userFilter, setUserFilter] = useState("all")
+    const [selectedProgramId, setSelectedProgramId] = useState<number | null>(null)
+    const [layout, setLayout] = useState<string>('medium')
+    const isOpen = selectedProgramId !== null
 
     const filtered = programs.filter((program) => {
         const matchesSearch = program.name.toLowerCase().includes(search.toLowerCase())
         const matchesUser = userFilter === "all" || String(program.student?.id) === userFilter
         return matchesSearch && matchesUser
     })
+
+    const handleOpen = (id: number) => {
+        setSelectedProgramId(id)
+    }
+
+    const handleClose = () => {
+        setSelectedProgramId(null)
+    }
+
+    const downloadPdf = () => {
+        if (selectedProgramId == null) return
+        toast.info("Gerando PDF, aguarde...")
+        try{
+            exportPdf({ programId: selectedProgramId, layout })
+        }catch{
+            toast.error("Erro ao gerar PDF")
+        }finally{
+            toast.success("PDF gerado com sucesso!")
+            handleClose()
+        }
+    }
 
     if (isLoadingPrograms || isLoadingUsers) return <LoadingState message="Carregando programas..." />
     if (programError || userError) return <ErrorState message="Erro ao carregar programas" />
@@ -115,7 +143,7 @@ export function TrainingProgramList() {
                                     <Button asChild variant="outline" size="sm" className="flex-1">
                                         <Link href={`/training-sheets/${program.id}`}>Fichas</Link>
                                     </Button>
-                                    <Button variant="outline" size="sm" className="flex-1 cursor-pointer" onClick={() => exportPdf(program.id)} disabled={isPending}>
+                                    <Button variant="outline" size="sm" className="flex-1 cursor-pointer" onClick={() => handleOpen(program.id)} disabled={isPending}>
                                         Exportar treino<FileTextIcon />
                                     </Button>
                                 </div>
@@ -124,6 +152,39 @@ export function TrainingProgramList() {
                     ))}
                 </div>
             )}
+            <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+                <DialogContent>
+                <DialogHeader>
+                            <DialogTitle>Faça o download do seu treino</DialogTitle>
+                        </DialogHeader>
+                        <FieldGroup className="py-4">
+                            <Field>
+                                <Label>Selecione o tipo de layout</Label>
+                                <Select onValueChange={(e) => setLayout(e)} value={layout}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="layout" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>layout</SelectLabel>
+                                        <SelectItem value="simple">Simples</SelectItem>
+                                        <SelectItem value="medium">medio</SelectItem>
+                                        <SelectItem value="elaborated">Elaborado</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                                </Select>
+                            </Field>
+                        </FieldGroup>
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button type="button" variant="outline">Cancelar</Button>
+                            </DialogClose>
+                            <Button variant="outline" size="sm" className="flex-1 cursor-pointer" onClick={() => downloadPdf()} disabled={isPending || selectedProgramId == null}>
+                                Exportar treino<FileTextIcon />
+                            </Button>
+                        </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

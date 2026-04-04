@@ -131,10 +131,10 @@ public class TrainingProgramController {
 
     @GetMapping("/{programId}/export/pdf")
     @ProgramOwnerOrAdmin
-    public ResponseEntity<byte[]> exportProgramPdf(@PathVariable Long programId) {
+    public ResponseEntity<byte[]> exportProgramPdf(@PathVariable Long programId, @RequestParam (defaultValue = "simple") String layout) {
         log.info("GET /api/training-programs/{}/export/pdf", programId);
 
-        TrainingProgramPdfFileResponse file = exportTrainingProgramPdfUseCase.execute(programId);
+        TrainingProgramPdfFileResponse file = exportTrainingProgramPdfUseCase.execute(programId, layout);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(file.getContentType()))

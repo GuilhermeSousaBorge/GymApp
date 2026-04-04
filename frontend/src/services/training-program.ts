@@ -42,9 +42,10 @@ export const trainingProgramService = {
         return response.data
     },
 
-    async exportTraining(programId: number) {
+    async exportTraining(programId: number, layout: string) {
         const response = await api.get(`${BASE_URL}/${programId}/export/pdf`, {
-            responseType: "blob"
+            responseType: "blob",
+            params: { layout }
         })
         const disposition = response.headers['content-disposition']
         const filename = disposition?.match(/filename="(.+)"/)?.[1] ?? `programa-${programId}.pdf`

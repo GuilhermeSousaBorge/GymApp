@@ -3,10 +3,10 @@ package backend.training.usecase;
 import backend.infrastructure.exception.BadRequestException;
 import backend.training.dto.TrainingProgramExportData;
 import backend.training.dto.TrainingProgramPdfFileResponse;
+import backend.training.infrastructure.pdf.TrainingProgramPdfExporterFactory;
 import backend.training.model.entity.TrainingExercise;
 import backend.training.model.entity.TrainingProgram;
 import backend.training.port.TrainingExerciseQueryPort;
-import backend.training.port.TrainingProgramPdfExporterPort;
 import backend.training.port.TrainingProgramQueryPort;
 import backend.training.port.TrainingSheetQueryPort;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +30,10 @@ public class ExportTrainingProgramPdfUseCase {
     private final TrainingProgramQueryPort programQueryPort;
     private final TrainingSheetQueryPort sheetQueryPort;
     private final TrainingExerciseQueryPort exerciseQueryPort;
-    private final TrainingProgramPdfExporterPort pdfExporterPort;
+    private final TrainingProgramPdfExporterFactory pdfExporterFactory;
 
     @Transactional(readOnly = true)
-    public TrainingProgramPdfFileResponse execute(Long programId) {
+    public TrainingProgramPdfFileResponse execute(Long programId, String layout) {
         log.info("Exportando treino em PDF para programId={}", programId);
 
         TrainingProgram program = programQueryPort.findByIdWithSheets(programId)
@@ -70,7 +70,7 @@ public class ExportTrainingProgramPdfUseCase {
                         : "Programa sem folhas de treino cadastradas")
                 .build();
 
-        byte[] content = pdfExporterPort.generate(exportData);
+        byte[] content = pdfExporterFactory.resolve(layout).generate(exportData);
 
         return TrainingProgramPdfFileResponse.builder()
                 .content(content)
