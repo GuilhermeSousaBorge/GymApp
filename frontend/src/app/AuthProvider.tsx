@@ -11,7 +11,12 @@ export default function AuthProvider({children}: {children: React.ReactNode}) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    authService.me().then(login).catch(logout).finally(() => setIsLoading(false));
+    const token = useAuth.getState().token;
+    if(!token){
+      logout();
+      setIsLoading(false)
+    }
+    authService.me().then((user) => login(user, token)).catch(logout).finally(() => setIsLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
