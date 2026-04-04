@@ -13,13 +13,12 @@ public class FlywayConfig {
 
     @Bean(initMethod = "migrate")
     public Flyway flyway(DataSource dataSource) {
+        System.setProperty("flyway.postgresql.transactional.lock", "false");
+
         return Flyway.configure()
                 .dataSource(dataSource)
                 .locations("classpath:db/migration")
                 .baselineOnMigrate(false)
-                .configuration(java.util.Map.of(
-                        "flyway.postgresql.transactional.lock", "false"
-                ))
                 .load();
     }
 }
