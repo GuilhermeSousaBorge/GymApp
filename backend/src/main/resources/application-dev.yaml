@@ -69,7 +69,9 @@ jwt:
   expiration: 86400000 # 24h em ms
 
 cookie:
-  secure: false
+  secure:
+SAMESITE:
+  secure: "Lax"
 # ===============================
 # LOGGING
 # ===============================

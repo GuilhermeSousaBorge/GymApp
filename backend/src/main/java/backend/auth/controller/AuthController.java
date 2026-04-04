@@ -44,6 +44,9 @@ public class AuthController {
     @Value("${cookie.secure}")
     private Boolean secure;
 
+    @Value("samesite.secure")
+    private String sameSite;
+
     private final LoginUseCase loginUseCase;
     private final RegisterUseCase registerUseCase;
     private final MeUseCase meUseCase;
@@ -160,7 +163,7 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie.from("token", token)
                 .httpOnly(true)
                 .secure(secure)       // true em produção
-                .sameSite("Lax")
+                .sameSite(sameSite)
                 .path("/")
                 .maxAge(jwtExpiration / 1000)
                 .build();
@@ -172,7 +175,7 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie.from("token", "")
                 .httpOnly(true)
                 .secure(secure)              // true em produção (https)
-                .sameSite("Lax")            // ESSENCIAL p/ Next.js
+                .sameSite(sameSite)            // ESSENCIAL p/ Next.js
                 .path("/")
                 .maxAge(0)
                 .build();
