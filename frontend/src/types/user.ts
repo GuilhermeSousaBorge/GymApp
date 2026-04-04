@@ -23,6 +23,6 @@ export type User = {
 }
 
 export type Auth = {
-  user: User
-  token: string
+  user: User | null
+  token: string | null
 }
