@@ -14,6 +14,9 @@ type RegisterPayload = {
     confirmPassword: string
 }
 
+type RefreshResponse = {
+    token: string;
+}
 
 export const authService = {
   async login(payload: LoginPayload): Promise<Auth>{
@@ -26,6 +29,11 @@ export const authService = {
     return data
   },
 
+  async refresh(): Promise<RefreshResponse> {
+    const { data } = await api.post("/auth/refresh")
+    return data
+  },
+
   async logout(){
     await api.post("/auth/logout")
   },
@@ -33,5 +41,25 @@ export const authService = {
   async me(): Promise<User>{
     const {data} = await api.get("/auth/me")
     return data
-  }
+  },
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const { data } = await api.post("/auth/password/forgot", { email })
+    return data
+  },
+
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    const { data } = await api.post("/auth/password/reset", { token, newPassword })
+    return data
+  },
+
+  async sendEmailVerification(email: string): Promise<{ message: string }> {
+    const { data } = await api.post("/auth/email/verification/send", { email })
+    return data
+  },
+
+  async confirmEmailVerification(token: string): Promise<{ message: string }> {
+    const { data } = await api.post("/auth/email/verification/confirm", { token })
+    return data
+  },
 };

@@ -1,10 +1,8 @@
 package backend.auth.usecase;
 
 import backend.auth.dto.LoginRequest;
-import backend.auth.dto.LoginResponse;
+import backend.auth.dto.SessionResult;
 import backend.infrastructure.exception.UnauthorizedException;
-import backend.infrastructure.security.JwtTokenProvider;
-import backend.user.mapper.UserMapper;
 import backend.user.model.entity.User;
 import backend.user.model.valueObjects.Email;
 import backend.user.port.UserQueryPort;
@@ -20,12 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class LoginUseCase {
 
     private final UserQueryPort userQueryPort;
-    private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final CreateSessionUseCase createSessionUseCase;
 
-    @Transactional(readOnly = true)
-    public LoginResponse execute(LoginRequest request){
+    @Transactional
+    public SessionResult execute(LoginRequest request){
         log.info("Tentativa de login para email: {}", request.getEmail());
 
         Email email = new Email(request.getEmail());
@@ -46,13 +43,7 @@ public class LoginUseCase {
             throw new UnauthorizedException("Email ou senha inválidos");
         }
 
-        String token = jwtTokenProvider.generateToken(user);
-
         log.info("Login bem-sucedido: {}", request.getEmail());
-
-        return LoginResponse.builder()
-                .user(mapper.toResponse(user))
-                .token(token)
-                .build();
+        return createSessionUseCase.execute(user);
     }
 }

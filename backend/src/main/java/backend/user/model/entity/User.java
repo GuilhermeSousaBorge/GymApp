@@ -68,6 +68,10 @@ public class User {
     @Builder.Default  // Valor padrão no Builder
     private Boolean active = true;
 
+    @Column(name = "email_verified", nullable = false)
+    @Builder.Default
+    private Boolean emailVerified = true;
+
     /**
      * Relacionamento Many-to-One com Role
      * Muitos usuários podem ter a mesma role

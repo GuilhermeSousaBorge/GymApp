@@ -1,11 +1,9 @@
 package backend.auth.usecase;
 
-import backend.auth.dto.LoginResponse;
 import backend.auth.dto.RegisterRequest;
+import backend.auth.dto.SessionResult;
 import backend.infrastructure.exception.BadRequestException;
-import backend.infrastructure.security.JwtTokenProvider;
 import backend.user.dto.UserResponse;
-import backend.user.mapper.UserMapper;
 import backend.user.model.entity.Role;
 import backend.user.model.entity.User;
 import backend.user.model.enums.Gender;
@@ -43,13 +41,10 @@ class RegisterUseCaseTest {
     private RolePort rolePort;
 
     @Mock
-    private UserMapper mapper;
-
-    @Mock
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private JwtTokenProvider jwtTokenProvider;
+    private CreateSessionUseCase createSessionUseCase;
 
     @InjectMocks
     private RegisterUseCase useCase;
@@ -81,12 +76,15 @@ class RegisterUseCaseTest {
         when(passwordEncoder.encode("12345678")).thenReturn("hashed-password");
         when(rolePort.findByName("Aluno")).thenReturn(Optional.of(alunoRole));
         when(userCommandPort.save(any(User.class))).thenReturn(saved);
-        when(jwtTokenProvider.generateToken(saved)).thenReturn("jwt-register");
-        when(mapper.toResponse(saved)).thenReturn(responseUser);
+        when(createSessionUseCase.execute(saved)).thenReturn(SessionResult.builder()
+                .user(responseUser)
+                .accessToken("jwt-register")
+                .refreshToken("refresh-register")
+                .build());
 
-        LoginResponse result = useCase.execute(request);
+        SessionResult result = useCase.execute(request);
 
-        assertEquals("jwt-register", result.getToken());
+        assertEquals("jwt-register", result.getAccessToken());
         assertSame(responseUser, result.getUser());
         verify(userCommandPort).save(any(User.class));
     }

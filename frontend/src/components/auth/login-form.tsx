@@ -5,6 +5,7 @@ import { authService } from "@/services/auth";
 import { useAuth } from "@/stores/auth";
 import { useUi } from "@/stores/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -71,13 +72,12 @@ export const LoginForm = () => {
     </div>
 
     <div className="flex justify-end">
-      <Button
-        type="button"
-        variant="link"
-        className="h-auto p-0 text-sm text-muted-foreground hover:text-yellow-500"
+      <Link
+        href="/forgot-password"
+        className="text-sm text-muted-foreground hover:text-yellow-500 underline-offset-4 hover:underline"
       >
         Esqueceu a senha?
-      </Button>
+      </Link>
     </div>
 
     <Button

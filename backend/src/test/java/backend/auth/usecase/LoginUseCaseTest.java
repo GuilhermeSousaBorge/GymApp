@@ -1,11 +1,9 @@
 package backend.auth.usecase;
 
 import backend.auth.dto.LoginRequest;
-import backend.auth.dto.LoginResponse;
+import backend.auth.dto.SessionResult;
 import backend.infrastructure.exception.UnauthorizedException;
-import backend.infrastructure.security.JwtTokenProvider;
 import backend.user.dto.UserResponse;
-import backend.user.mapper.UserMapper;
 import backend.user.model.entity.User;
 import backend.user.model.valueObjects.Email;
 import backend.user.model.valueObjects.Password;
@@ -32,13 +30,10 @@ class LoginUseCaseTest {
     private UserQueryPort userQueryPort;
 
     @Mock
-    private UserMapper mapper;
-
-    @Mock
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private JwtTokenProvider jwtTokenProvider;
+    private CreateSessionUseCase createSessionUseCase;
 
     @InjectMocks
     private LoginUseCase useCase;
@@ -56,12 +51,15 @@ class LoginUseCaseTest {
 
         when(userQueryPort.findByEmail(new Email("john@example.com"))).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("12345678", "hashed")).thenReturn(true);
-        when(jwtTokenProvider.generateToken(user)).thenReturn("jwt-token");
-        when(mapper.toResponse(user)).thenReturn(userResponse);
+        when(createSessionUseCase.execute(user)).thenReturn(SessionResult.builder()
+                .user(userResponse)
+                .accessToken("jwt-token")
+                .refreshToken("refresh-token")
+                .build());
 
-        LoginResponse result = useCase.execute(request);
+        SessionResult result = useCase.execute(request);
 
-        assertEquals("jwt-token", result.getToken());
+        assertEquals("jwt-token", result.getAccessToken());
         assertSame(userResponse, result.getUser());
         verify(userQueryPort).findByEmail(new Email("john@example.com"));
     }

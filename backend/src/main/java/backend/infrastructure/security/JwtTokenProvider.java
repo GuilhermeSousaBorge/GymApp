@@ -3,13 +3,15 @@ package backend.infrastructure.security;
 import backend.user.model.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * CAMADA: INFRASTRUCTURE - Security
@@ -33,6 +35,17 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private Long jwtExpiration;  // Tempo de expiração em ms (ex: 86400000 = 24h)
 
+    @PostConstruct
+    public void validateSecretLength() {
+        if(jwtSecret == null || jwtSecret.isBlank()){
+            throw new IllegalArgumentException("A chave secreta não pode ser nula ou vazia.");
+        }
+        int secretBytes = jwtSecret.getBytes(UTF_8).length;
+        if (secretBytes < 32) {
+            throw new IllegalArgumentException("A chave secreta deve ter pelo menos 32 caracteres para segurança adequada.");
+        }
+    }
+
     /**
      * Gera um token JWT para o usuário
      *
@@ -44,11 +57,11 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + jwtExpiration);
 
         return Jwts.builder()
-                .setSubject(user.getId().toString())           // ID do usuário
+                .subject(user.getId().toString())           // ID do usuário
                 .claim("role", user.getRole().getName())       // Nome da role
-                .setIssuedAt(now)                              // Data de criação
-                .setExpiration(expiryDate)                     // Data de expiração
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)  // Assina com chave secreta
+                .issuedAt(now)                              // Data de criação
+                .expiration(expiryDate)                     // Data de expiração
+                .signWith(getSigningKey())  // Assina com chave secreta
                 .compact();
     }
 
@@ -60,20 +73,20 @@ public class JwtTokenProvider {
      */
     public Long getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(getSigningKey())
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
 
         return Long.parseLong(claims.getSubject());
     }
 
     public String getRoleFromToken(String token){
         Claims claims = Jwts.parser()
-                .setSigningKey(getSigningKey())
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
 
         return claims.get("role", String.class);
     }
@@ -87,9 +100,9 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .setSigningKey(getSigningKey())
+                    .verifyWith(getSigningKey())
                     .build()
-                    .parseClaimsJws(token);
+                    .parseSignedClaims(token);
             return true;
         } catch (Exception e) {
             // Token inválido, expirado ou malformado
@@ -100,8 +113,8 @@ public class JwtTokenProvider {
     /**
      * Gera a chave de assinatura baseada no secret
      */
-    private Key getSigningKey() {
-        byte[] keyBytes = jwtSecret.getBytes();
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = jwtSecret.getBytes(UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

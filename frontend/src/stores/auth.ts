@@ -8,6 +8,7 @@ type Store = {
   user: User | null;
   token: string | null;
   login: (user: User | null, token: string | null) => void;
+  setToken: (token: string) => void;
   logout: () => void;
 };
 
@@ -19,6 +20,10 @@ export const useAuth = create<Store>()(
       login: (user, token) => {
         document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24}`
         set({ user, token })
+      },
+      setToken: (token) => {
+        document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24}`
+        set({ token })
       },
       logout: () => {
         document.cookie = "token=; path=/; max-age=0"

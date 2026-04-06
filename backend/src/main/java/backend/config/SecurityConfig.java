@@ -3,6 +3,7 @@ package backend.config;
 import backend.infrastructure.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,18 +13,22 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final Environment environment;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, Environment environment) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.environment = environment;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http){
         http
                 // API stateless, sem sessão
                 .cors(Customizer.withDefaults())
@@ -33,33 +38,47 @@ public class SecurityConfig {
                                 SessionCreationPolicy.STATELESS
                         )
                 )
-
-                // 🔓 libera tudo por enquanto
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
+                .authorizeHttpRequests(auth -> {
+                        auth.requestMatchers(
                                 "/api/auth/**",
-                                "/h2-console/**",
-                                "/graphiql/**",
-                                "/graphql",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/actuator/health"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                        ).permitAll();
+                        if(isDevEnvironment()){
+                            auth.requestMatchers("/h2-console/**").permitAll();
+                        }else{
+                            auth.requestMatchers("/h2-console/**").denyAll();
+                        }
+                        auth.anyRequest().authenticated();
+                    }
+
                 )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
-
-                // ❌ DESLIGA Basic Auth e Form Login
-//                .httpBasic(Customizer.withDefaults())
                 .formLogin(AbstractHttpConfigurer::disable)
-
-                // H2 console
-                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
+                .headers(headers -> {
+                    if(isDevEnvironment()){
+                        headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable);
+                    }else{
+                        headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin);
+                        headers.contentSecurityPolicy(csp ->
+                                csp.policyDirectives("default-src 'self'"));
+                        headers.httpStrictTransportSecurity(hsts ->
+                                hsts.includeSubDomains(true).maxAgeInSeconds(31536000));
+                        headers.contentTypeOptions(Customizer.withDefaults());
+                        headers.cacheControl(Customizer.withDefaults());
+                    }
+                });
 
         return http.build();
+    }
+
+    private boolean isDevEnvironment(){
+        return Arrays.stream(environment.getActiveProfiles())
+                .anyMatch("dev"::equalsIgnoreCase);
     }
 }

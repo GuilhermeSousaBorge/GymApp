@@ -1,10 +1,8 @@
 package backend.auth.usecase;
 
-import backend.auth.dto.LoginResponse;
+import backend.auth.dto.SessionResult;
 import backend.auth.dto.RegisterRequest;
 import backend.infrastructure.exception.BadRequestException;
-import backend.infrastructure.security.JwtTokenProvider;
-import backend.user.mapper.UserMapper;
 import backend.user.model.entity.Role;
 import backend.user.model.entity.User;
 import backend.user.model.valueObjects.Email;
@@ -26,13 +24,12 @@ public class RegisterUseCase {
     private final UserValidationPort userValidationPort;
     private final UserCommandPort userCommandPort;
     private final RolePort rolePort;
-    private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final CreateSessionUseCase createSessionUseCase;
 
 
     @Transactional
-    public LoginResponse execute(RegisterRequest request) {
+    public SessionResult execute(RegisterRequest request) {
         log.info("Tentativa de registro para email: {}", request.getEmail());
 
         Email email = new Email(request.getEmail());
@@ -53,6 +50,7 @@ public class RegisterUseCase {
                 .passwordHash(passwordHash)
                 .gender(request.getGender())
                 .active(true)
+                .emailVerified(false)
                 .role(defaultRole)
                 .build();
 
@@ -61,11 +59,6 @@ public class RegisterUseCase {
         log.info("Usuário registrado com sucesso: {} (ID {})",
                 savedUser.getEmail(), savedUser.getId());
 
-        String token = jwtTokenProvider.generateToken(savedUser);
-
-        return LoginResponse.builder()
-                .user(mapper.toResponse(savedUser))
-                .token(token)
-                .build();
+        return createSessionUseCase.execute(savedUser);
     }
 }
