@@ -41,25 +41,18 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
-  # ===============================
-  # SECURITY (DEV MODE)
-  # ===============================
-  #  security:
-  #    user:
-  #      name: admin
-  #      password: "{noop}admin"
-  #      roles: ADMIN
-
-  # ===============================
-  # GRAPHQL
-  # ===============================
-  graphql:
-    graphiql:
-      enabled: true
-      path: /graphiql
-    schema:
-      printer:
-        enabled: true
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS}
+            required: ${MAIL_SMTP_STARTTLS_REQUIRED}
 
 # ===============================
 # JWT (JJWT)
@@ -67,9 +60,18 @@ spring:
 jwt:
   secret: "mYs3cr3tK3y$uP3rS3cur3W1thAtL3ast256B1tsF0rHS256Alg0r1thm!"
   expiration: 86400000 # 24h em ms
+  refresh-expiration: 604800000 # 7 dias em ms
+
+auth:
+  email-verification-expiration: 900000 # 15 min
+  password-reset-expiration: 900000 # 15 min
+
+app:
+  frontend:
+    url: http://localhost:3000
 
 cookie:
-  secure:
+  secure: false
   same-site: Lax
 # ===============================
 # LOGGING

@@ -5,7 +5,9 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   const isPublic =
     pathname === "/" ||
-    pathname.startsWith("/auth");
+    pathname.startsWith("/auth") || 
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/reset-password");
 
   // não logado tentando rota privada
   if (!token && !isPublic) {
@@ -25,5 +27,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next|favicon.ico).*)"],
+  matcher: [
+    "/((?!_next|favicon.ico).*)"
+  ],
 };

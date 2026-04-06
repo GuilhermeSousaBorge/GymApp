@@ -17,3 +17,15 @@ export const registerSchema = z.object({
     error: "As senhas não são iguais",
     path: ['confirmPassword']
 })
+
+export const forgotPasswordSchema = z.object({
+    email: z.email("Email inválido"),
+})
+
+export const resetPasswordSchema = z.object({
+    newPassword: z.string().min(8, "A senha deve conter no mínimo 8 caracteres"),
+    confirmPassword: z.string(),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+    error: "As senhas não são iguais",
+    path: ['confirmPassword'],
+})
