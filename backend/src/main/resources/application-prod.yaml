@@ -43,6 +43,9 @@ spring:
     properties:
       mail:
         smtp:
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
           auth: ${MAIL_SMTP_AUTH}
           starttls:
             enable: ${MAIL_SMTP_STARTTLS}
@@ -78,6 +81,10 @@ management:
     web:
       exposure:
         include: health
+  health:
+    mail:
+      enabled: false
+
 cookie:
   secure: ${COOKIE_SECURE:true}
   same-site: ${SAME_SITE_SECURE:None}
