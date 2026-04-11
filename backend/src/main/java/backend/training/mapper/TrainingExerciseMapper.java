@@ -32,6 +32,7 @@ public class TrainingExerciseMapper {
                 .name(exercise.getName())
                 .description(exercise.getDescription())
                 .equipment(exercise.getEquipment())
+                .videoUrl(exercise.getVideoUrl())
                 .category(toCategoryInfo(exercise.getCategory()))
                 .build();
     }

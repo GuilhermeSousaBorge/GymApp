@@ -2,16 +2,17 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog"
 import { ErrorState } from "@/components/ui/error-state"
 import { LoadingState } from "@/components/ui/loading-state"
 import { PageHeader } from "@/components/ui/page-header"
-import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog"
 import { useDeleteTrainingExercise, useTrainingExercises } from "@/hooks/training-exercise"
 import { handleMessageError } from "@/lib/handle-error"
-import { Dumbbell, Plus, Repeat, Layers, Clock, FileText } from "lucide-react"
+import { Clock, Dumbbell, FileText, Layers, PlayCircle, Plus, Repeat } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { toast } from "sonner"
+import { WatchVideoModal } from "./modal-watch-video"
 
 interface TrainingExerciseListProps {
     sheetId: number
@@ -19,6 +20,7 @@ interface TrainingExerciseListProps {
 
 export function TrainingExerciseList({ sheetId }: TrainingExerciseListProps) {
     const [deleteId, setDeleteId] = useState<number | null>(null)
+    const [videoUrl, setVideoUrl] = useState<string | undefined | null>(null)
 
     const { data: exercises = [], isLoading, error } = useTrainingExercises({ sheetId })
     const { mutateAsync: deleteExercise, isPending: isDeleting } = useDeleteTrainingExercise()
@@ -68,26 +70,35 @@ export function TrainingExerciseList({ sheetId }: TrainingExerciseListProps) {
                             </CardHeader>
                             <CardContent className="flex flex-col gap-3 flex-1">
                                 <div className="flex flex-col gap-2 text-sm flex-1">
-                                    <div className="flex items-center gap-2 text-muted-foreground">
-                                        <Layers className="h-3.5 w-3.5 shrink-0" />
-                                        <span>Séries: <span className="text-foreground font-medium">{exercise.sets}</span></span>
+                                    <div>
+                                        {exercise.exerciseInfo?.videoUrl && (
+                                            <Button onClick={() => setVideoUrl(exercise?.exerciseInfo?.videoUrl)} variant="outline" size="sm">
+                                                <PlayCircle size={16} /> Assistir vídeo
+                                            </Button>
+                                        )}
                                     </div>
-                                    <div className="flex items-center gap-2 text-muted-foreground">
-                                        <Repeat className="h-3.5 w-3.5 shrink-0" />
-                                        <span>Repetições: <span className="text-foreground font-medium">{exercise.reps}</span></span>
-                                    </div>
-                                    {exercise.restTimeInSeconds && (
+                                    <div>
                                         <div className="flex items-center gap-2 text-muted-foreground">
-                                            <Clock className="h-3.5 w-3.5 shrink-0" />
-                                            <span>Descanso: <span className="text-foreground">{exercise.restTimeInSeconds}s</span></span>
+                                            <Layers className="h-3.5 w-3.5 shrink-0" />
+                                            <span>Séries: <span className="text-foreground font-medium">{exercise.sets}</span></span>
                                         </div>
-                                    )}
-                                    {exercise.techniqueNotes && (
-                                        <div className="flex items-start gap-2 text-muted-foreground">
-                                            <FileText className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-                                            <span className="text-foreground text-xs leading-relaxed">{exercise.techniqueNotes}</span>
+                                        <div className="flex items-center gap-2 text-muted-foreground">
+                                            <Repeat className="h-3.5 w-3.5 shrink-0" />
+                                            <span>Repetições: <span className="text-foreground font-medium">{exercise.reps}</span></span>
                                         </div>
-                                    )}
+                                        {exercise.restTimeInSeconds && (
+                                            <div className="flex items-center gap-2 text-muted-foreground">
+                                                <Clock className="h-3.5 w-3.5 shrink-0" />
+                                                <span>Descanso: <span className="text-foreground">{exercise.restTimeInSeconds}s</span></span>
+                                            </div>
+                                        )}
+                                        {exercise.techniqueNotes && (
+                                            <div className="flex items-start gap-2 text-muted-foreground">
+                                                <FileText className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                                                <span className="text-foreground text-xs leading-relaxed">{exercise.techniqueNotes}</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="flex gap-2 pt-2">
                                     <Button asChild variant="outline" size="sm" className="flex-1">
@@ -120,6 +131,9 @@ export function TrainingExerciseList({ sheetId }: TrainingExerciseListProps) {
                 confirmLabel="Confirmar exclusão"
                 pendingLabel="Excluindo..."
             />
+            {videoUrl && (
+                <WatchVideoModal videoUrl={videoUrl} onClose={() => setVideoUrl(null)} />
+            )}
         </div>
     )
 }

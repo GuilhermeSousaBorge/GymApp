@@ -38,6 +38,7 @@ public class TrainingExerciseResponse {
         private String name;
         private String description;
         private String equipment;
+        private String videoUrl;
         private CategoryInfo category;
 
         @Getter @Setter
